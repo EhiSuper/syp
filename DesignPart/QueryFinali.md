@@ -81,10 +81,13 @@ Song:
     album: string -
     playlists: Playlist[] 
 }
+<<<<<<< HEAD
+=======
 
 
 
 
+>>>>>>> origin/modification/css
 
 
 
