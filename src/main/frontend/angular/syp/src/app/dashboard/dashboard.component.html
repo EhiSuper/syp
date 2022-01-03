@@ -1,0 +1,16 @@
+<button *ngIf="logged==false"><a routerLink="/login">Login</a></button>
+<button *ngIf="logged==false"><a routerLink="/subscribe">Subscribe</a></button>
+<button *ngIf="logged==true"><a routerLink="/users/{{userLoggedIn!.id}}">Hi {{userLoggedIn!.username}}</a></button>
+<button *ngIf="logged==true" (click)="logout()">Logout</button>
+<button *ngIf="allowed==true"><a routerLink="/addSong">Add a new song</a></button>
+<button *ngIf="logged==true"><a routerLink="/addPlaylist">Add a new Playlist</a></button>
+
+<h2>Top Playlists</h2>
+<div class="playlists-menu">
+  <a *ngFor="let playlist of playlists"
+      routerLink="/playlists/{{playlist.id}}">
+      {{playlist.name}}
+  </a>
+</div>
+
+<app-search-bar></app-search-bar>

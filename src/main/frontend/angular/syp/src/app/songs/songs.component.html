@@ -1,0 +1,11 @@
+<h2>Songs</h2>
+
+<ul class="songs">
+  <li *ngFor="let song of songs">
+    <a routerLink="/songs/{{song.id}}">
+      {{song.track}}
+    </a>
+    <button *ngIf="showModifyForm == true" class="delete" title="delete song"
+      (click)="deleteSongFromPlaylist(song)">x</button>
+  </li>
+</ul>
