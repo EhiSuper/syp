@@ -23,6 +23,23 @@ public class SongController {
         return songService.getSongById(id);
     }
 
+    @PostMapping("/api/songs")
+    Song saveSong(@RequestBody Song newSong){
+        Song savedSong = songService.saveSong(newSong);
+        return savedSong;
+    }
+
+    @PutMapping("/api/songs")
+    Song updateSong(@RequestBody List<Song> songs){
+        Song updatedSong = songService.updateSong(songs.get(0), songs.get(1));
+        return updatedSong;
+    }
+
+    @DeleteMapping("/api/songs/{id}")
+    void deleteSong(@PathVariable(value="id") String id){
+        songService.deleteSong(id);
+    }
+
     @GetMapping("/api/songs/popular")
     List<Song> getPopularSongs(@RequestParam(value="number", defaultValue = "5") String id) {
         return songService.getPopularSongs(Integer.parseInt(id));
@@ -42,22 +59,4 @@ public class SongController {
     Double getAverageCommentsPerSong() {
         return songService.getAverageCommentsPerSong();
     }
-
-    @PostMapping("/api/songs")
-    Song saveSong(@RequestBody Song newSong){
-        Song savedSong = songService.saveSong(newSong);
-        return savedSong;
-    }
-
-    @PutMapping("/api/songs")
-    Song updateSong(@RequestBody List<Song> songs){
-        Song updatedSong = songService.updateSong(songs.get(0), songs.get(1));
-        return updatedSong;
-    }
-
-    @DeleteMapping("/api/songs/{id}")
-    void deleteSong(@PathVariable(value="id") String id){
-        songService.deleteSong(id);
-    }
-
 }

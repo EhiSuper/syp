@@ -31,46 +31,94 @@ public class PlaylistService {
     }
 
     List<Playlist> getPlaylistsByRegex(String regex){
-        Query findPlaylistsByRegex = new Query(Criteria.where("name").regex("^" + regex, "i"));
-        return mongoTemplate.find(findPlaylistsByRegex, Playlist.class);
+        try{
+            Query findPlaylistsByRegex = new Query(Criteria.where("name").regex("^" + regex, "i"));
+            return mongoTemplate.find(findPlaylistsByRegex, Playlist.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     Playlist getPlaylistById(String id){
-        Query findPlaylistById = new Query(Criteria.where("_id").is(id));
-        return mongoTemplate.findOne(findPlaylistById, Playlist.class);
+        try{
+            Query findPlaylistById = new Query(Criteria.where("_id").is(id));
+            return mongoTemplate.findOne(findPlaylistById, Playlist.class);
+        } catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     Playlist savePlaylist(Playlist newPlaylist){
-        //prepare fields to put in mongodb
-        Playlist savedPlaylist = mongoTemplate.insert(newPlaylist);
+        Playlist savedPlaylist = null;
+        try {
+            savedPlaylist = mongoTemplate.insert(newPlaylist);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
 
+        try{
+            playlistRepository.insert(savedPlaylist.getIdentifier(), savedPlaylist.getName());
+        } catch (Exception e){
+            e.printStackTrace();
+            Query findPlaylistById = new Query(Criteria.where("_id").is(savedPlaylist.getIdentifier()));
+            mongoTemplate.remove(findPlaylistById, Playlist.class);
+            return null;
+        }
+
+        //manage redundancy
         Playlist embeddedPlaylistInfo = new Playlist(savedPlaylist.getIdentifier(), savedPlaylist.getName(),
                                             null, null, null, null);
 
+        //update creator's createdPlaylists array
         Query findCreator = new Query(Criteria.where("_id").is(savedPlaylist.getCreator().getIdentifier()));
         Update updateCreator = new Update().push("createdPlaylists", embeddedPlaylistInfo);
         mongoTemplate.updateFirst(findCreator, updateCreator, User.class);
 
+        //update contained songs' playlists array
         List<String> songsIdentifiers = getIdentifiersFromPlaylist(savedPlaylist);
+
         if(songsIdentifiers != null){
             Query findSongs = new Query(Criteria.where("_id").in(songsIdentifiers));
             Update updateSongs = new Update().push("playlists", embeddedPlaylistInfo);
             mongoTemplate.updateMulti(findSongs, updateSongs, Song.class);
         }
 
-        //consistency between graph and document DBs
-        playlistRepository.insert(savedPlaylist.getIdentifier(), savedPlaylist.getName());
+
         return savedPlaylist;
     }
 
     public Playlist updatePlaylist(Playlist oldPlaylist, Playlist newPlaylist) {
+        Playlist savedPlaylist = null;
+        try{
+            savedPlaylist = mongoTemplate.save(newPlaylist);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+        //if name changed, redundancy must be managed
+        if (!oldPlaylist.getName().equals(newPlaylist.getName())){
+            try{
+                playlistRepository.updateName(newPlaylist.getIdentifier(), newPlaylist.getName());
+            } catch (Exception e){
+                e.printStackTrace();
+                mongoTemplate.save(oldPlaylist);
+                return null;
+            }
+            updateName(newPlaylist);
+        }
+
+        //manage redundancy on songs
         List<String> removedSongsIdentifiers = getSongsOnlyInFirstPlaylist(oldPlaylist, newPlaylist);
 
         List<String> insertedSongsIdentifiers = getSongsOnlyInFirstPlaylist(newPlaylist, oldPlaylist);
 
         if(removedSongsIdentifiers != null){
             Playlist embeddedOldPlaylistInfo = new Playlist(oldPlaylist.getIdentifier(), oldPlaylist.getName(),
-                                                                null, null, null, null);
+                                                 null, null, null, null);
 
             Query findSongs = new Query(Criteria.where("_id").in(removedSongsIdentifiers));
             Update updateSongs = new Update().pull("playlists", embeddedOldPlaylistInfo);
@@ -79,17 +127,12 @@ public class PlaylistService {
 
         if(insertedSongsIdentifiers != null){
             Playlist embeddedNewPlaylistInfo = new Playlist(newPlaylist.getIdentifier(), newPlaylist.getName(),
-                                                                null, null, null, null);
+                                                 null, null, null, null);
 
             Query findSongs = new Query(Criteria.where("_id").in(insertedSongsIdentifiers));
             Update updateSongs = new Update().push("playlists", embeddedNewPlaylistInfo);
             mongoTemplate.updateMulti(findSongs, updateSongs, Song.class);
         }
-
-        Playlist savedPlaylist = mongoTemplate.save(newPlaylist);
-
-        if (!oldPlaylist.getName().equals(newPlaylist.getName()))
-            updateName(newPlaylist);
 
         return savedPlaylist;
     }
@@ -99,15 +142,13 @@ public class PlaylistService {
         Update updateCreator = new Update().set("createdPlaylists.$.name", playlist.getName());
         mongoTemplate.updateFirst(findCreator, updateCreator, User.class);
 
-
         Query findSongs = new Query(Criteria.where("playlists._id").is(new ObjectId(playlist.getIdentifier())));
         Update updateSongs = new Update().set("playlists.$.name", playlist.getName());
         mongoTemplate.updateMulti(findSongs, updateSongs, Song.class);
-
-        playlistRepository.updateTitle(playlist.getIdentifier(), playlist.getName());
     }
 
     List<String> getSongsOnlyInFirstPlaylist(Playlist firstPlaylist, Playlist secondPlaylist){
+
         List<String> firstSongsIdentifiers = new ArrayList<>();
         for (Song song : firstPlaylist.getSongs()) {
             firstSongsIdentifiers.add(song.getIdentifier());
@@ -140,11 +181,31 @@ public class PlaylistService {
     }
 
     public void deletePlaylist(String id) {
-        Query findPlaylistById = new Query(Criteria.where("_id").is(id));
-        Playlist deletedPlaylist = mongoTemplate.findAndRemove(findPlaylistById, Playlist.class);
-        Playlist embeddedPlaylistInfo = new Playlist(deletedPlaylist.getIdentifier(), deletedPlaylist.getName(),
-                                                                   null, null, null, null);
+        Playlist deletedPlaylist = null;
+        try{
+            Query findPlaylistById = new Query(Criteria.where("_id").is(id));
+            deletedPlaylist = mongoTemplate.findAndRemove(findPlaylistById, Playlist.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            //return null;
+            return;
+        }
 
+        //remove node from graph database
+        try{
+            playlistRepository.deletePlaylistByIdentifier(deletedPlaylist.getIdentifier());
+        } catch (Exception e){
+            e.printStackTrace();
+            mongoTemplate.insert(deletedPlaylist);
+            //return null;
+            return;
+        }
+
+        //remove redundancy
+        Playlist embeddedPlaylistInfo = new Playlist(deletedPlaylist.getIdentifier(), deletedPlaylist.getName(),
+                                          null, null, null, null);
+
+        //eliminate createdPlaylists array entry regarding deleted playlist
         Query findCreator = new Query(Criteria.where("_id").is(deletedPlaylist.getCreator().getIdentifier()));
         Update updateCreator = new Update().pull("createdPlaylists", embeddedPlaylistInfo);
         mongoTemplate.updateFirst(findCreator, updateCreator, User.class);
@@ -152,44 +213,89 @@ public class PlaylistService {
         List<String> songsIdentifiers = getIdentifiersFromPlaylist(deletedPlaylist);
 
         if(songsIdentifiers != null){
+            //eliminate playlists array entry regarding deleted playlist
             Query findSongs = new Query(Criteria.where("_id").in(songsIdentifiers));
             Update updateSongs = new Update().pull("playlists", embeddedPlaylistInfo);
             mongoTemplate.updateMulti(findSongs, updateSongs, Song.class);
         }
-
-        playlistRepository.deletePlaylistByIdentifier(deletedPlaylist.getIdentifier());
     }
 
-    public void addPlaylistFollow(String userId, String playlistId) {
-        playlistRepository.addPlaylistFollow(userId, playlistId);
+    public void addLike(String userId, String playlistId) {
+        try{
+            playlistRepository.addLike(userId, playlistId);
+        } catch (Exception e){
+            e.printStackTrace();
+            //return null;
+            return;
+        }
     }
 
-    public void removePlaylistFollow(String userId, String playlistId) {
-        playlistRepository.removePlaylistFollow(userId, playlistId);
+    public void removeLike(String userId, String playlistId) {
+        try{
+            playlistRepository.removeLike(userId, playlistId);
+        } catch (Exception e){
+            e.printStackTrace();
+            //return null;
+            return;
+        }
     }
 
-    public List<Playlist> getFollowedPlaylists(String userId) {
-        return playlistRepository.getFollowedPlaylists(userId);
+    public List<Playlist> getLikedPlaylists(String userId) {
+        try{
+            return playlistRepository.getLikedPlaylists(userId);
+        } catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Playlist> getMostLikedPlaylists(int number){
+        try{
+            return playlistRepository.getMostLikedPlaylists(number);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Playlist> getSuggestedPlaylists(String id, int number){
+        try{
+            return playlistRepository.getSuggestedPlaylists(id, number);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Double getAverageSongsContained() {
-        ProjectionOperation fProjectStage = project("_id", "name").and("songs")
+        ProjectionOperation projectEmptyArrayInPlaylistsWithoutSongs = project("_id", "name").and("songs")
                 .applyCondition(ifNull("songs").then(new ArrayList<>()));
-        ProjectionOperation sProjectStage = project("_id", "name").and("songs").size().as("numberOfSongs");
-        GroupOperation groupStage = group().avg("numberOfSongs").as("avgNumberOfSongs");
+        ProjectionOperation getNumberOfSongs = project("_id", "name").and("songs").size().as("numberOfSongs");
+        GroupOperation groupAllAndGetAverageSongs = group().avg("numberOfSongs").as("avgNumberOfSongs");
 
-        Aggregation aggregation = newAggregation(fProjectStage, sProjectStage, groupStage);
-        AggregationResults<Document> result = mongoTemplate.aggregate(
-                aggregation, "playlists", Document.class);
-        Document document = result.getUniqueMappedResult();
-        return document.getDouble("avgNumberOfSongs");
-    }
+        Aggregation aggregation = newAggregation(projectEmptyArrayInPlaylistsWithoutSongs,
+                                                 getNumberOfSongs,
+                                                 groupAllAndGetAverageSongs);
 
-    public List<Playlist> getMostFollowedPlaylists(int number){
-        return playlistRepository.getMostFollowedPlaylists(number);
+        try{
+            AggregationResults<Document> result = mongoTemplate.aggregate(
+                    aggregation, "playlists", Document.class);
+
+            Document document = result.getUniqueMappedResult();
+
+            return document.getDouble("avgNumberOfSongs");
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Double getAverageFollowsPerPlaylist(){
-        return playlistRepository.getAverageFollowsPerPlaylist();
+        try{
+            return playlistRepository.getAverageFollowsPerPlaylist();
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -28,77 +28,159 @@ public class SongService {
     }
 
     List<Song> getSongsByRegex(String regex){
-        Query findSongsByRegex = new Query(Criteria.where("track").regex("^" + regex, "i"));
-        return mongoTemplate.find(findSongsByRegex, Song.class);
+        try{
+            Query findSongsByRegex = new Query(Criteria.where("track").regex("^" + regex, "i"));
+            return mongoTemplate.find(findSongsByRegex, Song.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     Song getSongById(String id){
-        Query findSongById = new Query(Criteria.where("_id").is(id));
-        return mongoTemplate.findOne(findSongById, Song.class);
+        try{
+            Query findSongById = new Query(Criteria.where("_id").is(id));
+            return mongoTemplate.findOne(findSongById, Song.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     Song saveSong(Song newSong){
-        Song savedSong = mongoTemplate.insert(newSong);
-        //consistency between graph and document DBs
-        songRepository.insert(savedSong.getIdentifier(), savedSong.getTrack());
+        Song savedSong = null;
+        try{
+            mongoTemplate.insert(newSong);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+        try{
+            songRepository.insert(savedSong.getIdentifier(), savedSong.getTrack());
+        } catch (Exception e){
+            e.printStackTrace();
+            Query findSongById = new Query(Criteria.where("_id").is(savedSong.getIdentifier()));
+            mongoTemplate.remove(findSongById, Song.class);
+            return null;
+        }
+
         return savedSong;
     }
 
     Song updateSong(Song oldSong, Song newSong){
-        Song updatedSong = mongoTemplate.save(newSong);
+        Song updatedSong = null;
+
+        try{
+            updatedSong = mongoTemplate.save(newSong);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
 
         if(!oldSong.getTrack().equals(newSong.getTrack()) || !oldSong.getArtist().equals(newSong.getArtist())){
+
+            try{
+                songRepository.updateTrack(updatedSong.getIdentifier(), updatedSong.getTrack());
+            } catch (Exception e){
+                e.printStackTrace();
+                mongoTemplate.save(oldSong);
+                return null;
+            }
+
             Query findPlaylists = new Query(Criteria.where("songs._id").is(new ObjectId(updatedSong.getIdentifier())));
             Update updatePlaylists = new Update().set("songs.$.track", updatedSong.getTrack())
                                                  .set("songs.$.artist", updatedSong.getArtist());
             mongoTemplate.updateMulti(findPlaylists, updatePlaylists, Playlist.class);
         }
 
-        songRepository.updateTitle(updatedSong.getIdentifier(), updatedSong.getTrack());
         return updatedSong;
     }
 
     void deleteSong(String id){
-        Query findSongById = new Query(Criteria.where("_id").is(id));
-        mongoTemplate.remove(findSongById, Song.class);
+        Song deletedSong = null;
+        try{
+            Query findSongById = new Query(Criteria.where("_id").is(id));
+            deletedSong = mongoTemplate.findAndRemove(findSongById, Song.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            //return null;
+            return;
+        }
+
+        try{
+            songRepository.deleteSongByIdentifier(id);
+        } catch (Exception e){
+            e.printStackTrace();
+            mongoTemplate.insert(deletedSong);
+            //return null
+            return;
+        }
 
         Query findPlaylists = new Query(Criteria.where("songs._id").is(new ObjectId(id)));
         Update updatePlaylists = new Update().set("songs.$.track", "this song has been removed by an admin");
         mongoTemplate.updateMulti(findPlaylists, updatePlaylists, Playlist.class);
-
-        songRepository.deleteSongByIdentifier(id);
     }
 
     public List<Song> getPopularSongs(int numberToReturn) {
-        MatchOperation firstFilterStage = match(new Criteria("playlists").exists(true));
-        ProjectionOperation projectStage = project("_id", "track").and("playlists").size().as("numberOfPlaylists");
-        MatchOperation secondFilterStage = match(new Criteria("numberOfPlaylists").gt(0));
-        SortOperation sortStage = sort(Sort.by(Sort.Direction.DESC, "numberOfPlaylists"));
+        MatchOperation filterSongsWithoutAttributePlaylists = match(new Criteria("playlists").exists(true));
+        ProjectionOperation getNumberOfPlaylists = project("_id", "track").and("playlists").size().as("numberOfPlaylists");
+        MatchOperation filterSongsContainedInNoPlaylists = match(new Criteria("numberOfPlaylists").gt(0));
+        SortOperation sortByNumberOfPlaylists = sort(Sort.by(Sort.Direction.DESC, "numberOfPlaylists"));
 
-        Aggregation aggregation = newAggregation(firstFilterStage, projectStage, secondFilterStage, sortStage, limit(numberToReturn));
-        AggregationResults<Song> result = mongoTemplate.aggregate(
-                aggregation, "songs", Song.class);
-        return result.getMappedResults();
-    }
+        Aggregation aggregation = newAggregation(filterSongsWithoutAttributePlaylists,
+                                                 getNumberOfPlaylists,
+                                                 filterSongsContainedInNoPlaylists,
+                                                 sortByNumberOfPlaylists,
+                                                 limit(numberToReturn));
 
-    public Double getAveragePlaylistsPerSong() {
-        ProjectionOperation fProjectStage = project("_id", "track").and("playlists")
-                .applyCondition(ifNull("playlists").then(new ArrayList<>()));
-        ProjectionOperation sProjectStage = project("_id", "track").and("playlists").size().as("numberOfPlaylists");
-        GroupOperation groupStage = group().avg("numberOfPlaylists").as("avgNumberOfPlaylists");
-
-        Aggregation aggregation = newAggregation(fProjectStage, sProjectStage, groupStage);
-        AggregationResults<Document> result = mongoTemplate.aggregate(
-                aggregation, "songs", Document.class);
-        Document document = result.getUniqueMappedResult();
-        return document.getDouble("avgNumberOfPlaylists");
-    }
-
-    public Double getAverageCommentsPerSong(){
-        return songRepository.getAverageCommentsPerSong();
+        try{
+            AggregationResults<Song> result = mongoTemplate.aggregate(
+                    aggregation, "songs", Song.class);
+            return result.getMappedResults();
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Song> getMostCommentedSongs(int number) {
-        return songRepository.getMostCommentedSongs(number);
+        try{
+            return songRepository.getMostCommentedSongs(number);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Double getAveragePlaylistsPerSong() {
+        ProjectionOperation projectEmptyArrayInSongsWithoutPlaylists = project("_id", "track").and("playlists")
+                .applyCondition(ifNull("playlists").then(new ArrayList<>()));
+        ProjectionOperation getNumberOfPlaylists = project("_id", "track").and("playlists").size().as("numberOfPlaylists");
+        GroupOperation groupAllAndGetAveragePlaylists = group().avg("numberOfPlaylists").as("avgNumberOfPlaylists");
+
+        Aggregation aggregation = newAggregation(projectEmptyArrayInSongsWithoutPlaylists,
+                                                 getNumberOfPlaylists,
+                                                 groupAllAndGetAveragePlaylists);
+
+        try{
+            AggregationResults<Document> result = mongoTemplate.aggregate(
+                    aggregation, "songs", Document.class);
+
+            Document document = result.getUniqueMappedResult();
+            return document.getDouble("avgNumberOfPlaylists");
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Double getAverageCommentsPerSong(){
+        try{
+            return songRepository.getAverageCommentsPerSong();
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }

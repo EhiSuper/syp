@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class Song {
 
     @Id
     @org.springframework.data.neo4j.core.schema.Id
+    @Property("id")
     private String identifier;
     private String track;
     private String artist;

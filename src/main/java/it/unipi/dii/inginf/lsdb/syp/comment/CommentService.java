@@ -14,22 +14,48 @@ public class CommentService {
 
 
     public Comment addComment(Comment newComment) {
-        return commentRepository.save(newComment);
+        try{
+            return commentRepository.save(newComment);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Comment> getSongComments(String songId) {
-        return commentRepository.findCommentsBySongId(songId);
+        try{
+            return commentRepository.findCommentsBySongId(songId);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Comment> getUserComments(String userId) {
-        return commentRepository.findCommentsByUserId(userId);
+        try{
+            return commentRepository.findCommentsByUserId(userId);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Comment updateComment(Comment updatedComment){
-        return commentRepository.save(updatedComment);
+        try{
+            return commentRepository.save(updatedComment);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void deleteComment(Long id){
-        commentRepository.deleteById(id);
+        try{
+            commentRepository.deleteById(id);
+        } catch (Exception e){
+            e.printStackTrace();
+            //return null;
+            return;
+        }
     }
 }

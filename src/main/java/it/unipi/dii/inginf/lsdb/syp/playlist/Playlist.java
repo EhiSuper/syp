@@ -6,6 +6,7 @@ import it.unipi.dii.inginf.lsdb.syp.user.User;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
 
 import java.util.Date;
 import java.util.List;
@@ -15,14 +16,16 @@ import java.util.List;
 public class Playlist {
     @Id
     @org.springframework.data.neo4j.core.schema.Id
+    @Property("id")
     private String identifier;
     private String name;
-
     private Date creationDate;
     private User creator;
     private List<Song> songs;
 
     private Integer numberOfFollowers;
+
+    //constructor, getters and setters
 
     public Playlist(String identifier, String name, Date creationDate, User creator,
                     List<Song> songs, Integer numberOfFollowers) {

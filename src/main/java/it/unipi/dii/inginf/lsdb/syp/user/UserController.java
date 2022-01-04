@@ -7,6 +7,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 public class UserController {
+
     private final UserService userService;
 
     UserController(UserService userService) {
@@ -17,10 +18,36 @@ public class UserController {
     List<User> getUsersByRegex(@RequestParam(value="username", defaultValue = "") String regex) {
         return userService.getUsersByRegex(regex);
     }
-
     @GetMapping("/api/users/{id}")
     User getUsersById(@PathVariable(value="id") String id) {
         return userService.getUserById(id);
+    }
+
+    @PostMapping("/api/users")
+    User saveUser(@RequestBody User newUser){
+        User savedUser = userService.saveUser(newUser);
+        return savedUser;
+    }
+
+    @PutMapping("/api/users")
+    User updateUser(@RequestBody List<User> users){
+        User updatedUser = userService.updateUser(users.get(0), users.get(1));
+        return updatedUser;
+    }
+
+    @DeleteMapping("/api/users/{id}")
+    void deleteUser(@PathVariable(value="id") String id){
+        userService.deleteUser(id);
+    }
+
+    @GetMapping("/api/follow")
+    void addFollow(@RequestParam(value="follower") String follower, @RequestParam(value="followed") String followed){
+        userService.addFollow(follower, followed);
+    }
+
+    @GetMapping("/api/unfollow")
+    void removeFollow(@RequestParam(value="follower") String follower, @RequestParam(value="followed") String followed){
+        userService.removeFollow(follower, followed);
     }
 
     @GetMapping("/api/users/followers/{id}")
@@ -38,6 +65,11 @@ public class UserController {
         return userService.getLikesById(id);
     }
 
+    @GetMapping("/api/users/similar/{id}")
+    List<User> getSimilarUsers(@RequestParam(value="playlists", defaultValue = "2") String numberOfPlaylists,
+                               @PathVariable(value="userid") String id) {
+        return userService.getSimilarUsers(id, Integer.parseInt(numberOfPlaylists));
+    }
 
     @GetMapping("/api/users/topcreators")
     List<User> getTopCreators(@RequestParam(value="number", defaultValue = "5") String number) {
@@ -45,19 +77,19 @@ public class UserController {
     }
 
     @GetMapping("/api/users/mostsongsofartist")
-    List<User> getUsersWithMostSongsWithinAPeriod(@RequestParam(value="number", defaultValue = "5") String number,
+    List<User> getUsersWithMostSongsOfASpecificArtist(@RequestParam(value="number", defaultValue = "5") String number,
                                               @RequestParam(value="artist", defaultValue = "") String artist) {
-        return userService.getUsersWithMostSongsWithinAPeriod(Integer.parseInt(number), artist);
-    }
-
-    @GetMapping("/api/users/averageplaylists")
-    Double getAverageCreatedPlaylistsPerUser() {
-        return userService.getAverageCreatedPlaylistsPerUser();
+        return userService.getUsersWithMostSongsOfASpecificArtist(Integer.parseInt(number), artist);
     }
 
     @GetMapping("/api/users/mostfollowed")
     List<User> getMostFollowedUsers(@RequestParam(value="number", defaultValue = "5") String number) {
         return userService.getMostFollowedUsers(Integer.parseInt(number));
+    }
+
+    @GetMapping("/api/users/averageplaylists")
+    Double getAverageCreatedPlaylistsPerUser() {
+        return userService.getAverageCreatedPlaylistsPerUser();
     }
 
     @GetMapping("/api/users/averagefollows")
@@ -68,38 +100,5 @@ public class UserController {
     @GetMapping("/api/users/averagecomments")
     Double getAverageCommentsPerUser() {
         return userService.getAverageCommentsPerUser();
-    }
-
-    @GetMapping("/api/users/similar/{id}")
-    List<User> getSimilarUsers(@RequestParam(value="playlists", defaultValue = "2") String numberOfPlaylists,
-                               @PathVariable(value="userid") String id) {
-        return userService.getSimilarUsers(id, Integer.parseInt(numberOfPlaylists));
-    }
-
-    @PostMapping("/api/users")
-    User saveUser(@RequestBody User newUser){
-        User savedUser = userService.saveUser(newUser);
-        return savedUser;
-    }
-
-    @PutMapping("/api/users")
-    User updateUser(@RequestBody List<User> users){
-        User updatedUser = userService.updateUser(users.get(0), users.get(1));
-        return updatedUser;
-    }
-
-    @GetMapping("/api/follow")
-    void addFollow(@RequestParam(value="follower") String follower, @RequestParam(value="followed") String followed){
-        userService.addFollow(follower, followed);
-    }
-
-    @GetMapping("/api/unfollow")
-    void removeFollow(@RequestParam(value="follower") String follower, @RequestParam(value="followed") String followed){
-        userService.removeFollow(follower, followed);
-    }
-
-    @DeleteMapping("/api/users/{id}")
-    void deleteUser(@PathVariable(value="id") String id){
-        userService.deleteUser(id);
     }
 }

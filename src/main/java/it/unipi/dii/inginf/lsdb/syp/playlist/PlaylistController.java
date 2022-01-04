@@ -23,26 +23,6 @@ public class PlaylistController {
         return playlistService.getPlaylistById(id);
     }
 
-    @GetMapping("/api/users/playlistsfollowed/{id}")
-    List<Playlist> getFollowedPlaylists(@PathVariable(value="id") String userId) {
-        return playlistService.getFollowedPlaylists(userId);
-    }
-
-    @GetMapping("/api/playlists/averagesongs")
-    Double getAverageSongsContained() {
-        return playlistService.getAverageSongsContained();
-    }
-
-    @GetMapping("/api/playlists/mostfollowed")
-    List<Playlist> getMostFollowedPlaylists(@RequestParam(value="number", defaultValue = "5") String number) {
-        return playlistService.getMostFollowedPlaylists(Integer.parseInt(number));
-    }
-
-    @GetMapping("/api/playlists/averagefollows")
-    Double getAverageFollowsPerPlaylist() {
-        return playlistService.getAverageFollowsPerPlaylist();
-    }
-
     @PostMapping("/api/playlists")
     Playlist savePlaylist(@RequestBody Playlist newPlaylist){
         Playlist savedPlaylist = playlistService.savePlaylist(newPlaylist);
@@ -55,18 +35,48 @@ public class PlaylistController {
         return updatedPlaylist;
     }
 
-    @GetMapping("/api/like")
-    void addPlaylistFollow(@RequestParam(value="userId") String userId, @RequestParam(value="playlistId") String playlistId){
-        playlistService.addPlaylistFollow(userId, playlistId);
-    }
-
-    @GetMapping("/api/dislike")
-    void removePlaylistFollow(@RequestParam(value="userId") String userId, @RequestParam(value="playlistId") String playlistId){
-        playlistService.removePlaylistFollow(userId, playlistId);
-    }
-
     @DeleteMapping("/api/playlists/{id}")
     void deletePlaylist(@PathVariable(value="id") String id){
         playlistService.deletePlaylist(id);
     }
+
+    @GetMapping("/api/like")
+    void addLike(@RequestParam(value="userId") String userId, @RequestParam(value="playlistId") String playlistId){
+        playlistService.addLike(userId, playlistId);
+    }
+
+    @GetMapping("/api/dislike")
+    void removeLike(@RequestParam(value="userId") String userId, @RequestParam(value="playlistId") String playlistId){
+        playlistService.removeLike(userId, playlistId);
+    }
+
+    @GetMapping("/api/users/playlistsfollowed/{id}")
+    List<Playlist> getLikedPlaylists(@PathVariable(value="id") String userId) {
+        return playlistService.getLikedPlaylists(userId);
+    }
+
+    @GetMapping("/api/playlists/mostfollowed")
+    List<Playlist> getMostLikedPlaylists(@RequestParam(value="number", defaultValue = "5") String number) {
+        return playlistService.getMostLikedPlaylists(Integer.parseInt(number));
+    }
+
+    @GetMapping("/api/playlists/dashboard")
+    List<Playlist> getDashboardPlaylists(@RequestParam(value="number", defaultValue = "3") String number,
+                                         @RequestParam(value="id", defaultValue = "") String id) {
+        if(id.equals("")){
+            return playlistService.getMostLikedPlaylists(Integer.parseInt(number));
+        }
+        return playlistService.getSuggestedPlaylists(id, Integer.parseInt(number));
+    }
+
+    @GetMapping("/api/playlists/averagesongs")
+    Double getAverageSongsContained() {
+        return playlistService.getAverageSongsContained();
+    }
+
+    @GetMapping("/api/playlists/averagefollows")
+    Double getAverageFollowsPerPlaylist() {
+        return playlistService.getAverageFollowsPerPlaylist();
+    }
+
 }

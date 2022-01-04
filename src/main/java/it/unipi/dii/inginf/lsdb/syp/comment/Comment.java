@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.support.DateString;
 
 import java.util.Date;
 
@@ -15,15 +16,16 @@ public class Comment {
     @Id @GeneratedValue
     private Long id;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm", timezone = "default")
+    @DateString("yyyy-MM-dd HH:mm:ss")
     private Date date;
-    private Integer vote;
+    private String vote;
     private String body;
-    @Relationship(type = "WROTE", direction = Relationship.Direction.INCOMING)
+    @Relationship(type = "WRITE", direction = Relationship.Direction.INCOMING)
     private User user;
     @Relationship(type = "RELATED", direction = Relationship.Direction.OUTGOING)
     private Song song;
 
-    public Comment(Long id, Date date, Integer vote, String body, User user, Song song) {
+    public Comment(Long id, Date date, String vote, String body, User user, Song song) {
         this.id = id;
         this.date = date;
         this.vote = vote;
@@ -48,11 +50,11 @@ public class Comment {
         this.date = date;
     }
 
-    public Integer getVote() {
+    public String getVote() {
         return vote;
     }
 
-    public void setVote(Integer vote) {
+    public void setVote(String vote) {
         this.vote = vote;
     }
 

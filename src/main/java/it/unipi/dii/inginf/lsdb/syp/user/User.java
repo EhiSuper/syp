@@ -5,6 +5,7 @@ import it.unipi.dii.inginf.lsdb.syp.playlist.Playlist;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
 
 import java.util.Date;
 import java.util.List;
@@ -16,28 +17,29 @@ public class User {
 
     @Id
     @org.springframework.data.neo4j.core.schema.Id
+    @Property("id")
     private String identifier;
     private String firstName;
     private String secondName;
     private String password;
+    @Property("name")
     private String username;
     private Boolean isAdmin;
     private Date dateOfCreation;
-
     private Date dateOfBirth;
-
-
     private List<Playlist> createdPlaylists;
 
     private Integer numberOfFollowers;
     private Integer numberOfPlaylists;
-    private Integer numberOfSongsInPeriod;
+    private Integer numberOfSongs;
 
-    public User(String firstName, String password, String secondName, String username, Boolean isAdmin, Date dateOfCreation, Date dateOfBirth,
-                List<Playlist> createdPlaylists, Integer numberOfFollowers, Integer numberOfPlaylists, Integer numberOfSongsInPeriod) {
+    public User(String identifier, String firstName, String secondName, String password, String username,
+                Boolean isAdmin, Date dateOfCreation, Date dateOfBirth, List<Playlist> createdPlaylists,
+                Integer numberOfFollowers, Integer numberOfPlaylists, Integer numberOfSongs) {
+        this.identifier = identifier;
         this.firstName = firstName;
-        this.password = password;
         this.secondName = secondName;
+        this.password = password;
         this.username = username;
         this.isAdmin = isAdmin;
         this.dateOfCreation = dateOfCreation;
@@ -45,7 +47,7 @@ public class User {
         this.createdPlaylists = createdPlaylists;
         this.numberOfFollowers = numberOfFollowers;
         this.numberOfPlaylists = numberOfPlaylists;
-        this.numberOfSongsInPeriod = numberOfSongsInPeriod;
+        this.numberOfSongs = numberOfSongs;
     }
 
     @JsonProperty("id")
@@ -138,11 +140,11 @@ public class User {
         this.numberOfPlaylists = numberOfPlaylists;
     }
 
-    public Integer getNumberOfSongsInPeriod() {
-        return numberOfSongsInPeriod;
+    public Integer getNumberOfSongs() {
+        return numberOfSongs;
     }
 
-    public void setNumberOfSongsInPeriod(Integer numberOfSongsInPeriod) {
-        this.numberOfSongsInPeriod = numberOfSongsInPeriod;
+    public void setNumberOfSongs(Integer numberOfSongs) {
+        this.numberOfSongs = numberOfSongs;
     }
 }

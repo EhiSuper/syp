@@ -30,54 +30,119 @@ public class UserService {
     }
 
     List<User> getUsersByRegex(String regex){
-        Query findUsersByRegex = new Query(Criteria.where("username").regex("^" + regex, "i"));
-        return mongoTemplate.find(findUsersByRegex, User.class);
+        try{
+            Query findUsersByRegex = new Query(Criteria.where("username").regex("^" + regex, "i"));
+            return mongoTemplate.find(findUsersByRegex, User.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     User getUserById(String id){
-        Query findUserById = new Query(Criteria.where("_id").is(id));
-        return mongoTemplate.findOne(findUserById, User.class);
+        try{
+            Query findUserById = new Query(Criteria.where("_id").is(id));
+            return mongoTemplate.findOne(findUserById, User.class);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     User saveUser(User newUser){
-        User savedUser = mongoTemplate.insert(newUser);
+        User savedUser = null;
+        try{
+            savedUser = mongoTemplate.insert(newUser);
+        } catch (Exception e){
+            //failed operation
+            return null;
+        }
         //consistency between graph and document DBs
-        userRepository.insert(savedUser.getIdentifier(), savedUser.getUsername());
+        try{
+            userRepository.insert(savedUser.getIdentifier(), savedUser.getUsername());
+        } catch (Exception e){
+            //failed operation
+            Query findUserById = new Query(Criteria.where("_id").is(savedUser.getIdentifier()));
+            mongoTemplate.remove(findUserById, User.class);
+            return null;
+        }
+
         return savedUser;
     }
 
     User updateUser(User oldUser, User newUser){
-        User savedUser = mongoTemplate.save(newUser); //overwrites the entire document
-
-        if(!oldUser.getUsername().equals(newUser.getUsername())){
-            Query findPlaylists = new Query(Criteria.where("creator._id").is(new ObjectId(savedUser.getIdentifier())));
-            Update updatePlaylists = new Update().set("creator.username", savedUser.getUsername());
-            mongoTemplate.updateMulti(findPlaylists, updatePlaylists, Playlist.class);
-            userRepository.updateNickname(newUser.getIdentifier(), newUser.getUsername());
+        User updatedUser = null;
+        try {
+            updatedUser = mongoTemplate.save(newUser); //overwrites the entire document
+        } catch (Exception e){
+            //failed operation
+            return null;
         }
 
-        return savedUser;
-    }
+        if(!oldUser.getUsername().equals(newUser.getUsername())){
+            try {
+                userRepository.updateUsername(newUser.getIdentifier(), newUser.getUsername());
+            } catch (Exception e){
+                //failed operation
+                mongoTemplate.save(oldUser);
+                return null;
+            }
+            Query findPlaylists = new Query(Criteria.where("creator._id").is(new ObjectId(updatedUser.getIdentifier())));
+            Update updatePlaylists = new Update().set("creator.username", updatedUser.getUsername());
+            mongoTemplate.updateMulti(findPlaylists, updatePlaylists, Playlist.class);
+        }
 
-    void addFollow(String followerId, String followedId){
-        userRepository.addFollow(followerId, followedId);
-    }
-
-    void removeFollow(String followerId, String followedId){
-        userRepository.removeFollow(followerId, followedId);
+        return updatedUser;
     }
 
     void deleteUser(String id){
-        //update redundant info
-        Query findUserById = new Query(Criteria.where("_id").is(id));
-        mongoTemplate.remove(findUserById, User.class);
+        User deletedUser = null;
+        try{
+            Query findUserById = new Query(Criteria.where("_id").is(id));
+            deletedUser= mongoTemplate.findAndRemove(findUserById, User.class);
+        } catch (Exception e){
+            //failed operation
+            //return null
+            return;
+        }
+        try{
+            userRepository.deleteUserByIdentifier(id);
+        } catch (Exception e){
+            //failed operation
+            mongoTemplate.insert(deletedUser);
+            //return null
+            return;
+        }
 
+        //delete playlists owned by deleted user
         Query findPlaylistsByCreatorId = new Query(Criteria.where("creator._id").is(new ObjectId(id)));
         List<Playlist> deletedPlaylists = mongoTemplate.findAllAndRemove(findPlaylistsByCreatorId, Playlist.class);
+
+        //for each deleted playlist, remove redundant info in songs
         for(Playlist playlist: deletedPlaylists ){
             deleteRedundantInfo(playlist);
         }
-        userRepository.deleteUserByIdentifier(id);
+
+    }
+
+    void addFollow(String followerId, String followedId){
+        try{
+            userRepository.addFollow(followerId, followedId);
+        } catch (Exception e){
+            e.printStackTrace();
+            //return null;
+            return;
+        }
+    }
+
+    void removeFollow(String followerId, String followedId){
+        try{
+            userRepository.removeFollow(followerId, followedId);
+        } catch (Exception e){
+            e.printStackTrace();
+            //return null;
+            return;
+        }
     }
 
     private void deleteRedundantInfo(Playlist playlist) {
@@ -115,69 +180,137 @@ public class UserService {
 
 
     public List<User> getFollowersById(String id) {
-        return userRepository.getFollowers(id);
+        try{
+            return userRepository.getFollowers(id);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<User> getFollowedUsersById(String id) {
-        return userRepository.getFollowedUsers(id);
-    }
-
-    public List<User> getTopCreators(int numberToReturn) {
-        MatchOperation firstFilterStage = match(new Criteria("createdPlaylists").exists(true));
-        ProjectionOperation projectStage = project("_id", "username").and("createdPlaylists").size().as("numberOfPlaylists");
-        MatchOperation secondFilterStage = match(new Criteria("numberOfPlaylists").gt(0));
-        SortOperation sortStage = sort(Sort.by(Sort.Direction.DESC, "numberOfPlaylists"));
-
-        Aggregation aggregation = newAggregation(firstFilterStage, projectStage, secondFilterStage, sortStage, limit(numberToReturn));
-        AggregationResults<User> result = mongoTemplate.aggregate(
-                aggregation, "users", User.class);
-        return result.getMappedResults();
-    }
-
-    public Double getAverageCreatedPlaylistsPerUser() {
-        ProjectionOperation fProjectStage = project("_id", "username").and("createdPlaylists")
-                .applyCondition(ifNull("createdPlaylists").then(new ArrayList<>()));
-        ProjectionOperation sProjectStage = project("_id", "username").and("createdPlaylists").size().as("numberOfPlaylists");
-        GroupOperation groupStage = group().avg("numberOfPlaylists").as("avgNumberOfPlaylistsCreated");
-
-        Aggregation aggregation = newAggregation(fProjectStage, sProjectStage, groupStage);
-        AggregationResults<Document> result = mongoTemplate.aggregate(
-                aggregation, "users", Document.class);
-        Document document = result.getUniqueMappedResult();
-        return document.getDouble("avgNumberOfPlaylistsCreated");
-    }
-
-    public List<User> getMostFollowedUsers(int number){
-        return userRepository.getMostFollowedUsers(number);
-    }
-
-    public Double getAverageFollows(){
-        return userRepository.getAverageFollows();
-    }
-
-    public Double getAverageCommentsPerUser(){
-        return userRepository.getAverageCommentsPerUser();
-    }
-
-    public List<User> getSimilarUsers(String id, int numberOfPlaylist) {
-        return userRepository.getSimilarUsers(id, numberOfPlaylist);
-    }
-
-    public List<User> getUsersWithMostSongsWithinAPeriod(int numberToReturn, String artist) {
-        MatchOperation firstFilterStage = match(new Criteria("songs").exists(true));
-        ProjectionOperation fProjectStage = project("_id", "creator").and(filter("songs")
-                .as("songs").by(
-                        ComparisonOperators.valueOf("songs.artist").equalToValue(artist))).as("songs");
-        ProjectionOperation tProjectStage = project("_id", "creator").and("songs").size().as("numberOfSongsInPeriod");
-        GroupOperation groupStage = group("creator._id").first("creator.username").as("username").sum("numberOfSongsInPeriod").as("numberOfSongsInPeriod");
-        SortOperation sortStage = sort(Sort.by(Sort.Direction.DESC, "numberOfSongsInPeriod"));
-        Aggregation aggregation = newAggregation(firstFilterStage, fProjectStage, tProjectStage, groupStage, sortStage, limit(numberToReturn));
-        AggregationResults<User> result = mongoTemplate.aggregate(
-                aggregation, "playlists", User.class);
-        return result.getMappedResults();
+        try{
+            return userRepository.getFollowedUsers(id);
+        } catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<User> getLikesById(String id) {
-        return userRepository.getLikesById(id);
+        try{
+            return userRepository.getLikesById(id);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<User> getSimilarUsers(String id, int numberOfPlaylist) {
+        try{
+            return userRepository.getSimilarUsers(id, numberOfPlaylist);
+        } catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<User> getTopCreators(int numberToReturn) {
+        MatchOperation filterUsersWithoutAttributeCreatedPlaylists = match(new Criteria("createdPlaylists").exists(true));
+        ProjectionOperation getNumberOfCreatedPlaylists = project("_id", "username").and("createdPlaylists").size().as("numberOfPlaylists");
+        MatchOperation matchUsersWithAtLeastOneCreatedPlaylist = match(new Criteria("numberOfPlaylists").gt(0));
+        SortOperation sortByNumberOfCreatedPlaylists = sort(Sort.by(Sort.Direction.DESC, "numberOfPlaylists"));
+
+        Aggregation aggregation = newAggregation(filterUsersWithoutAttributeCreatedPlaylists,
+                                                 getNumberOfCreatedPlaylists,
+                                                 matchUsersWithAtLeastOneCreatedPlaylist,
+                                                 sortByNumberOfCreatedPlaylists,
+                                                 limit(numberToReturn));
+
+        try{
+            AggregationResults<User> result = mongoTemplate.aggregate(
+                    aggregation, "users", User.class);
+            return result.getMappedResults();
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<User> getUsersWithMostSongsOfASpecificArtist(int numberToReturn, String artist) {
+        MatchOperation filterPlaylistsWithoutAttributeSongs = match(new Criteria("songs").exists(true));
+        ProjectionOperation filterArraySongsBasedOnArtist = project("_id", "creator")
+                .and(filter("songs").as("songs").by(
+                ComparisonOperators.valueOf("songs.artist").equalToValue(artist))).as("songs");
+        ProjectionOperation getNumberOfSongsPerPlaylist = project("_id", "creator").and("songs").size().as("numberOfSongs");
+        GroupOperation groupByCreator = group("creator._id").first("creator.username").as("username").sum("numberOfSongs").as("numberOfSongs");
+        SortOperation sortByNumberOfSongs = sort(Sort.by(Sort.Direction.DESC, "numberOfSongs"));
+
+        Aggregation aggregation = newAggregation(filterPlaylistsWithoutAttributeSongs,
+                                                 filterArraySongsBasedOnArtist,
+                                                 getNumberOfSongsPerPlaylist,
+                                                 groupByCreator,
+                                                 sortByNumberOfSongs,
+                                                 limit(numberToReturn));
+
+        try{
+            AggregationResults<User> result = mongoTemplate.aggregate(
+                    aggregation, "playlists", User.class);
+
+            return result.getMappedResults();
+        } catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<User> getMostFollowedUsers(int number){
+        try{
+            return userRepository.getMostFollowedUsers(number);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Double getAverageCreatedPlaylistsPerUser() {
+        ProjectionOperation projectEmptyArrayInUsersWithoutCreatedPlaylists = project("_id", "username")
+                .and("createdPlaylists").applyCondition(ifNull("createdPlaylists").then(new ArrayList<>()));
+        ProjectionOperation getNumberOfCreatedPlaylists = project("_id", "username").and("createdPlaylists").size().as("numberOfPlaylists");
+        GroupOperation groupAllAndGetAverageCreatedPlaylists = group().avg("numberOfPlaylists").as("avgNumberOfPlaylistsCreated");
+
+        Aggregation aggregation = newAggregation(projectEmptyArrayInUsersWithoutCreatedPlaylists,
+                                                 getNumberOfCreatedPlaylists,
+                                                 groupAllAndGetAverageCreatedPlaylists);
+
+        try{
+            AggregationResults<Document> result = mongoTemplate.aggregate(
+                    aggregation, "users", Document.class);
+
+            Document document = result.getUniqueMappedResult();
+
+            return document.getDouble("avgNumberOfPlaylistsCreated");
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Double getAverageFollows(){
+        try{
+            return userRepository.getAverageFollows();
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Double getAverageCommentsPerUser(){
+        try{
+            return userRepository.getAverageCommentsPerUser();
+        } catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }

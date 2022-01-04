@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 //to remove _class attribute automatically added to new mongodb objects
-//could have problems storing dates... to check
 
 @Configuration
 public class AppConfig {
