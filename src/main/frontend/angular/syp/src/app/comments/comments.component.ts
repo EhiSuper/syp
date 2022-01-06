@@ -26,7 +26,7 @@ export class CommentsComponent implements OnInit {
   commented: boolean | undefined
   showCommentForm: boolean | undefined
 
-  constructor(private commentService: CommentService) { }
+  constructor(private commentService: CommentService, private userService: UserService) { }
 
   ngOnInit(): void {
     this.getComments()
@@ -44,8 +44,17 @@ export class CommentsComponent implements OnInit {
     }
   }
 
+  getUserLoggedInComments(): void{
+    this.commentService.getUserComments(this.userLoggedIn!.id)
+      .subscribe(comments => {
+        this.userLoggedIn!.comments = comments
+        this.updateUserLoggedIn()
+      })
+  }  
+
   checkCommented(){
     if (!this.userLoggedIn) return
+    if (this.userLoggedIn.comments == undefined) this.getUserLoggedInComments()
     if(!this.userLoggedIn.comments){
       this.commented = false
       return

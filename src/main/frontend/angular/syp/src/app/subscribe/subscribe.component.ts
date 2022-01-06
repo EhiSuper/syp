@@ -26,8 +26,8 @@ export class SubscribeComponent implements OnInit {
   }
 
   subscribe(): void {
-    this.userService.searchUsers(this.username!).subscribe(users => {
-      if(users.length !== 0) {
+    this.userService.getUserByUsername(this.username!).subscribe(users => {
+      if(users.length != 0) {
         window.alert("username already taken")
         return
       }

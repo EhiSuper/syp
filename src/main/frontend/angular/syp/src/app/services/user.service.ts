@@ -19,13 +19,13 @@ export class UserService {
 
   //provo a utilizzare searchUsers
 
-  /** GET user by username. Will 404 if id not found *//*
-  getUserByUsername(username: string): Observable<User> {
-    const url = `${this.usersUrl}/?username=${username}`;
-    return this.http.get<User>(url).pipe(
-      catchError(this.handleError<User>(`getUsers username=${username}`))
+  /** GET user by username. Will 404 if id not found */
+  getUserByUsername(username: string): Observable<User[]> {
+    const url = `${this.usersUrl}/login?username=${username}`;
+    return this.http.get<User[]>(url).pipe(
+      catchError(this.handleError<User[]>(`getUsers username=${username}`))
     );
-  }*/
+  }
 
   /** GET user by id. Will 404 if id not found */
   getUser(id: string): Observable<User> {
@@ -41,7 +41,7 @@ export class UserService {
       // if not search term, return empty hero array.
       return of([]);
     }
-    return this.http.get<User[]>(`${this.usersUrl}/?username=${term}`).pipe(
+    return this.http.get<User[]>(`${this.usersUrl}?username=${term}`).pipe(
       catchError(this.handleError<User[]>('searchUser', []))
     );
   }

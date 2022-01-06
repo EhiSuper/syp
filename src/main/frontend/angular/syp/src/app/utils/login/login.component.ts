@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   }
 
   login(): void {
-    this.userService.searchUsers(this.username!)
+    this.userService.getUserByUsername(this.username!)
       .subscribe((user) => {
         this.setUser(user[0])
       });

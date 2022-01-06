@@ -1,13 +1,19 @@
 <div *ngIf="playlist">
   <h2>{{playlist.name}} Details</h2>
   <div class="text-left">
-    <label for="playlist-name">Playlist name: </label>
-    <label id="playlist-name">{{playlist.name}}</label>
-    <label for="playlist-creationDate">Creation date: </label>
-    <label id="playlist-creationDate">{{playlist.creationDate | date}}</label>
-    <label for="playlist-creator">Creator: </label>
-    <label id="playlist-creator"><a
+    <div>
+      <label *ngIf="playlist.name" for="playlist-name">Playlist name: </label>
+      <label *ngIf="playlist.name" id="playlist-name">{{playlist.name}}</label>
+    </div>
+    <div>
+      <label *ngIf="playlist.creationDate" for="playlist-creationDate">Creation date: </label>
+      <label *ngIf="playlist.creationDate" id="playlist-creationDate">{{playlist.creationDate | date}}</label>
+    </div>
+    <div>
+      <label *ngIf="playlist.creator" for="playlist-creator">Creator: </label>
+      <label *ngIf="playlist.creator" id="playlist-creator"><a
         routerLink="/users/{{playlist.creator.id}}">{{playlist.creator.username}}</a></label>
+    </div> 
   </div>
   <div>
     <button *ngIf="followed == false" (click)="follow()">Follow</button>

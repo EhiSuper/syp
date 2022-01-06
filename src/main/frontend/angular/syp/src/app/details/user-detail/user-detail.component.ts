@@ -61,8 +61,17 @@ export class UserDetailComponent implements OnInit {
 
   }
 
+  getUserLoggedInFollowed(): void{
+    this.userService.getFollowed(this.userLoggedIn!.id)
+      .subscribe(followed => {
+        this.userLoggedIn!.followed = followed
+        this.updateUserLoggedIn()
+      })
+  }
+
   checkFollowed(): void {
     if (!this.userLoggedIn) return
+    if(this.userLoggedIn.followed == undefined) this.getUserLoggedInFollowed()
     if(!this.userLoggedIn.followed){
       this.followed = false;
       return

@@ -61,8 +61,17 @@ export class PlaylistDetailComponent implements OnInit {
     this.userLoggedIn = JSON.parse(user)
   }
 
+  getUserLoggedInPlaylistsFollowed(): void{
+    this.userService.getPlaylistsFollowed(this.userLoggedIn!.id)
+      .subscribe(playlists => {
+        this.userLoggedIn!.playlistsFollowed = playlists
+        this.updateUserLoggedIn()
+      })
+  }
+
   checkFollowed(): void {
     if (!this.userLoggedIn) return
+    if ( this.userLoggedIn.followed == undefined ) this.getUserLoggedInPlaylistsFollowed()
     if(!this.userLoggedIn.playlistsFollowed){
       this.followed = false
       return

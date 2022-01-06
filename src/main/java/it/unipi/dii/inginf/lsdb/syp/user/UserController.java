@@ -18,6 +18,13 @@ public class UserController {
     List<User> getUsersByRegex(@RequestParam(value="username", defaultValue = "") String regex) {
         return userService.getUsersByRegex(regex);
     }
+
+    @GetMapping("/api/users/login")
+    List<User> getUserByUsername(@RequestParam(value="username", defaultValue = "") String username) {
+        String regex = "^" + username + "$";
+        return userService.getUsersByRegex(regex);
+    }
+
     @GetMapping("/api/users/{id}")
     User getUsersById(@PathVariable(value="id") String id) {
         return userService.getUserById(id);
