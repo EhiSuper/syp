@@ -17,7 +17,7 @@ public interface UserRepository extends Neo4jRepository<User, String> {
     //done automatically by spring
     void deleteUserByIdentifier(String id);
 
-    @Query("MATCH (n:User {id = $followerId}), (n2:User {id = $followedId}) CREATE (n)-[:FOLLOWS]->(n2)")
+    @Query("MATCH (n:User {id: $followerId}), (n2:User {id: $followedId}) CREATE (n)-[:FOLLOWS]->(n2)")
     void addFollow(String followerId, String followedId);
 
     @Query("MATCH (n:User {id: $followerId})-[r:FOLLOWS]->(n2:User {id: $followedId}) DELETE r")

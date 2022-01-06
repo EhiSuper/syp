@@ -17,7 +17,7 @@ export class FollowersComponent implements OnInit {
 
   @Input() playlist: Playlist | undefined
   @Input() user: User | undefined
-  followers: User[] = []
+  followers: User[] | undefined = []
 
   constructor(private userService: UserService, private playlistService: PlaylistService) { }
 
@@ -28,15 +28,24 @@ export class FollowersComponent implements OnInit {
   getFollowers(): void {
     if (this.option == 'playlist') {
       this.playlistService.getFollowers(this.playlist!.id)
-        .subscribe(followers => this.followers = followers)
+        .subscribe(followers => {
+          this.playlist!.followers = followers
+          this.followers = followers
+        })
     }
     if(this.option == 'followers') {
       this.userService.getFollowers(this.user!.id)
-        .subscribe(followers => this.followers = followers)
+        .subscribe(followers => {
+          this.user!.followers = followers
+          this.followers = followers
+        })
     }
     if(this.option == 'followed') {
       this.userService.getFollowed(this.user!.id)
-        .subscribe(followed => this.followers = followed)
+        .subscribe(followed => {
+          this.user!.followed = followed
+          this.followers = followed
+        })
     }
   }
 }

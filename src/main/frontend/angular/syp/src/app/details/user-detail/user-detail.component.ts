@@ -66,16 +66,11 @@ export class UserDetailComponent implements OnInit {
       .subscribe(followed => {
         this.userLoggedIn!.followed = followed
         this.updateUserLoggedIn()
+        this.checkFollowed()
       })
   }
 
   checkFollowed(): void {
-    if (!this.userLoggedIn) return
-    if(this.userLoggedIn.followed == undefined) this.getUserLoggedInFollowed()
-    if(!this.userLoggedIn.followed){
-      this.followed = false;
-      return
-    }
     for (var i = 0; i < this.userLoggedIn!.followed!.length; i++) {
       if (this.userLoggedIn?.followed![i].username == this.user?.username) {
         this.followed = true
@@ -126,11 +121,13 @@ export class UserDetailComponent implements OnInit {
     this.userService.getUser(id)
       .subscribe(user => {
         this.user = user
+        this.show = 'playlistsCreated'
         this.checkAllowed()
         this.isMyAccount()
-        if(!this.myAccount)
-          this.checkFollowed()
-        this.show = 'playlistsCreated'
+        if(!this.myAccount){
+          if (!this.userLoggedIn) return
+          if(this.userLoggedIn.followed == undefined) this.getUserLoggedInFollowed()
+        }
       });
   }
 

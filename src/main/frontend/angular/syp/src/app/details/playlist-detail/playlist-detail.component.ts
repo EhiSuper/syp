@@ -34,17 +34,17 @@ export class PlaylistDetailComponent implements OnInit {
     this.getPlaylist();
   }
 
-  checkAllowed(): void{
-    if(!this.userLoggedIn){
+  checkAllowed(): void {
+    if (!this.userLoggedIn) {
       this.allowed = false
       return
     }
-    if(this.userLoggedIn?.isAdmin == true){
+    if (this.userLoggedIn?.isAdmin == true) {
       this.allowed = true
       return
     }
-    else{
-      if(this.playlist?.creator.username == this.userLoggedIn.username){
+    else {
+      if (this.playlist?.creator.username == this.userLoggedIn.username) {
         this.allowed = true
         return
       }
@@ -61,21 +61,16 @@ export class PlaylistDetailComponent implements OnInit {
     this.userLoggedIn = JSON.parse(user)
   }
 
-  getUserLoggedInPlaylistsFollowed(): void{
+  getUserLoggedInPlaylistsFollowed(): void {
     this.userService.getPlaylistsFollowed(this.userLoggedIn!.id)
       .subscribe(playlists => {
         this.userLoggedIn!.playlistsFollowed = playlists
         this.updateUserLoggedIn()
+        this.checkFollowed()
       })
   }
 
   checkFollowed(): void {
-    if (!this.userLoggedIn) return
-    if ( this.userLoggedIn.followed == undefined ) this.getUserLoggedInPlaylistsFollowed()
-    if(!this.userLoggedIn.playlistsFollowed){
-      this.followed = false
-      return
-    }
     for (var i = 0; i < this.userLoggedIn!.playlistsFollowed!.length; i++) {
       if (this.userLoggedIn?.playlistsFollowed![i].name == this.playlist?.name) {
         this.followed = true
@@ -93,7 +88,7 @@ export class PlaylistDetailComponent implements OnInit {
   }
 
   follow(): void {
-    if(!this.userLoggedIn?.playlistsFollowed){
+    if (!this.userLoggedIn?.playlistsFollowed) {
       this.userLoggedIn!.playlistsFollowed = []
     }
     this.userLoggedIn?.playlistsFollowed!.push(this.playlist!)
@@ -102,10 +97,10 @@ export class PlaylistDetailComponent implements OnInit {
     this.followed = true
   }
 
-  findIndexPlaylist(array: Array<Playlist>, playlist: Playlist){
+  findIndexPlaylist(array: Array<Playlist>, playlist: Playlist) {
     var index = 0
-    for(var i=0; i<array.length; i++){
-      if(array[i].name == playlist.name) return i
+    for (var i = 0; i < array.length; i++) {
+      if (array[i].name == playlist.name) return i
     }
     return -1
   }
@@ -123,9 +118,10 @@ export class PlaylistDetailComponent implements OnInit {
     this.playlistService.getPlaylist(id)
       .subscribe(playlist => {
         this.playlist = playlist
-        this.checkFollowed()
+        this.show = 'songs'
+        if (!this.userLoggedIn) return
+        if (this.userLoggedIn!.playlistsFollowed == undefined) this.getUserLoggedInPlaylistsFollowed()
         this.checkAllowed()
-        this.show  = 'songs'
       });
   }
 
@@ -133,7 +129,7 @@ export class PlaylistDetailComponent implements OnInit {
     this.location.back();
   }
 
-  modifyPlaylist(): void{
+  modifyPlaylist(): void {
     this.showForm()
     this.snapshot = Object.assign({}, this.playlist)
     this.snapshot!.songs = []
@@ -157,7 +153,7 @@ export class PlaylistDetailComponent implements OnInit {
     this.router.navigateByUrl('/dashboard')
   }
 
-  showForm(): void{
+  showForm(): void {
     this.showModifyForm = !this.showModifyForm
   }
 }
