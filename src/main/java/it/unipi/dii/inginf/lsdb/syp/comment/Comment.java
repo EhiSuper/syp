@@ -15,7 +15,7 @@ import java.util.Date;
 public class Comment {
     @Id @GeneratedValue
     private Long id;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm", timezone = "default")
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm", timezone = "default")
     @DateString("yyyy-MM-dd HH:mm:ss")
     private Date date;
     private String vote;

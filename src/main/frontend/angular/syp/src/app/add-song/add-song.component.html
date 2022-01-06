@@ -4,12 +4,12 @@
         <form (ngSubmit)="addSong()">
             <div class="form-group">
                 <input type="text" class="form-control" id="track" required name="track" placeholder="Track"
-                    [(ngModel)]="track">
+                    [(ngModel)]="track" required>
             </div>
 
             <div class="form-group">
                 <input type="text" class="form-control" id="artist" required name="artist" placeholder="Artist"
-                    [(ngModel)]="artist">
+                    [(ngModel)]="artist" required>
             </div>
 
             <div class="form-group">
