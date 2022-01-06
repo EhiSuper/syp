@@ -89,15 +89,20 @@
 
   body{
     text-align: center;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   button{
     margin: 20px;
   }
 
-  a{
+  a, a:hover, a:focus, a:active {
+    text-decoration: underline;
+    color: inherit;
     margin: 10px;
-  }
+}
 
   label{
     margin: 10px;
@@ -105,4 +110,11 @@
 
   li{
     list-style: none;
+  }
+
+  .details{
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
   }

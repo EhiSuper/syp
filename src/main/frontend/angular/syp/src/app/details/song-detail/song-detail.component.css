@@ -24,3 +24,8 @@ label {
     cursor: auto;
   }
   */
+
+  #song-lyric{
+    width: 400px;
+    text-align: justify;
+  }

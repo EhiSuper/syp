@@ -1,25 +1,33 @@
 <div *ngIf="song">
   <h2>{{song.track}} Details</h2>
-  <div *ngIf="song.track">
-    <label for="song-name">Song name: </label>
-    <label id="song-name">{{song.track}}</label>
+  <div class="details">
+    <div *ngIf="song.track">
+      <label for="song-name">Song name: </label>
+      <label id="song-name">{{song.track}}</label>
+    </div>
+    <div *ngIf="song.artist">
+      <label for="song-artist">Artist: </label>
+      <label id="song-artist">{{song.artist}}</label>
+    </div>
+    <div *ngIf="song.album">
+      <label for="song-album">Album: </label>
+      <label id="song-album">{{song.album}}</label>
+    </div>
+    <div *ngIf="song.year">
+      <label for="song-year">Year of publication: </label>
+      <label id="song-year">{{song.year}}</label>
+    </div>
+    <div *ngIf="song.lyric">
+      <label for="song-lyric">Song lyric: </label>
+    </div>
   </div>
-  <div *ngIf="song.artist">
-    <label for="song-artist">Artist: </label>
-    <label id="song-artist">{{song.artist}}</label>
+  <div>
+    <div>
+      <label id="song-lyric">{{song.lyric}}</label>
+    </div>
   </div>
-  <div *ngIf="song.album">
-    <label for="song-album">Album: </label>
-    <label id="song-album">{{song.album}}</label>
-  </div>
-  <div *ngIf="song.year">
-    <label for="song-year">Year of publication: </label>
-    <label id="song-year">{{song.year}}</label>
-  </div>
-  <div *ngIf="song.lyric">
-    <label for="song-lyric">Song lyric: </label>
-    <label id="song-lyric">{{song.lyric}}</label>
-  </div>
+
+
   <div>
     <button *ngIf="allowed == true" (click)="modifySong()">Modify the song</button>
     <div *ngIf="showModifyForm == true">
@@ -57,4 +65,5 @@
 </div>
 
 <app-playlists *ngIf="show=='playlists'" [song]="song" [option]="'song'"></app-playlists>
-<app-comments *ngIf="show=='comments'" [allowed]="allowed" [song]="song" [option]="'song'" [userLoggedIn]="userLoggedIn"></app-comments>
+<app-comments *ngIf="show=='comments'" [allowed]="allowed" [song]="song" [option]="'song'"
+  [userLoggedIn]="userLoggedIn"></app-comments>
