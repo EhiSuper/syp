@@ -1,6 +1,6 @@
 <h2>Comments</h2>
 
-<button *ngIf="commented == false && option == song" (click)="showCommentForm = !showCommentForm">Add Comment</button>
+<button *ngIf="commented == false && option == 'song'" (click)="showCommentForm = !showCommentForm">Add Comment</button>
 <div *ngIf="showCommentForm == true">
   <form (ngSubmit)="addComment()">
     <div class="form-group">

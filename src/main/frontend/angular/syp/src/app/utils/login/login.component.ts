@@ -27,11 +27,18 @@ export class LoginComponent implements OnInit {
   }
 
   setUser(user: User): void {
+    if(!user){
+      window.alert("Credentials are wrong")
+      return
+    }
     this.user = user
     if (this.user?.password == this.password) {
       const jsonData = JSON.stringify(this.user);
       localStorage.setItem('userLoggedIn', jsonData);
       this.router.navigateByUrl('/dashboard');
+    }
+    else{
+      window.alert("Credentials are wrong")
     }
   }
 }

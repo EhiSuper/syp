@@ -55,10 +55,6 @@ export class CommentsComponent implements OnInit {
   checkCommented(){
     if (!this.userLoggedIn) return
     if (this.userLoggedIn.comments == undefined) this.getUserLoggedInComments()
-    if(!this.userLoggedIn.comments){
-      this.commented = false
-      return
-    }
     for (var i = 0; i < this.userLoggedIn!.comments!.length; i++) {
       if (this.userLoggedIn?.comments![i].song?.id == this.song?.id) {
         this.commented = true
@@ -110,6 +106,7 @@ export class CommentsComponent implements OnInit {
       this.commentService.updateComment(comment)
         .subscribe();
     }
+    this.showModifyForm = !this.showModifyForm
   }
 
   deleteComment(comment: userComment): void {

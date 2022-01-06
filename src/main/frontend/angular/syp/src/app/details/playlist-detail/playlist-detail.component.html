@@ -12,8 +12,8 @@
     <div>
       <label *ngIf="playlist.creator" for="playlist-creator">Creator: </label>
       <label *ngIf="playlist.creator" id="playlist-creator"><a
-        routerLink="/users/{{playlist.creator.id}}">{{playlist.creator.username}}</a></label>
-    </div> 
+          routerLink="/users/{{playlist.creator.id}}">{{playlist.creator.username}}</a></label>
+    </div>
   </div>
   <div>
     <button *ngIf="followed == false" (click)="follow()">Follow</button>
@@ -42,6 +42,6 @@
   </div>
 </div>
 
-<app-songs *ngIf="show=='songs'" [allowed]="allowed" [playlist]="playlist" [showModifyForm]="showModifyForm"
-  [songs]="playlist!.songs"></app-songs>
+<app-songs *ngIf="show=='songs'" [allowed]="allowed" [playlist]="playlist" [showModifyForm]="showModifyForm">
+</app-songs>
 <app-followers *ngIf="show=='followers'" [playlist]="playlist" [option]="'playlist'"></app-followers>

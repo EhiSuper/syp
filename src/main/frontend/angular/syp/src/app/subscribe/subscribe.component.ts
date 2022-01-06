@@ -41,8 +41,9 @@ export class SubscribeComponent implements OnInit {
     var username = this.username
     var password = this.password
     var dateOfCreation = new Date()
+    var isAdmin = false
     if(password == this.confirmPassword){
-      this.userService.addUser({ username, password, dateOfCreation } as User)
+      this.userService.addUser({ username, password, dateOfCreation, isAdmin } as User)
       .subscribe(_ => {
         this.router.navigateByUrl('/login');
       });
