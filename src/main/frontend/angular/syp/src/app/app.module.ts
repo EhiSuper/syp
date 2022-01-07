@@ -21,6 +21,8 @@ import { LoginComponent } from './utils/login/login.component';
 import { AddSongComponent } from './add-song/add-song.component';
 import { SubscribeComponent } from './subscribe/subscribe.component';
 import { AddPlaylistComponent } from './add-playlist/add-playlist.component';
+import { AggregationsComponent } from './aggregations/aggregations.component';
+import { AggregationDetailComponent } from './details/aggregation-detail/aggregation-detail.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,8 @@ import { AddPlaylistComponent } from './add-playlist/add-playlist.component';
     AddSongComponent,
     SubscribeComponent,
     AddPlaylistComponent,
+    AggregationsComponent,
+    AggregationDetailComponent,
   ],
   imports: [
     BrowserModule,

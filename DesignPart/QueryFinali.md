@@ -31,24 +31,24 @@ Analytics and Statistics
         2) On average a song in how many playlists is contained? --- MONGO 
 
     User
-        1) How many users follows a user in avg? --- GRAPH 
-        2) How many playlists are followed by a user in avg? --- GRAPH
-        3) How many song a user comments in avg? --- GRAPH 
-        4) How many playlist are created by a user in avg? --- MONGO
+        1) How many followers has a user in average? --- GRAPH 
+        2) How many playlists are followed by a user in average? --- GRAPH
+        3) How many songs a user comments in avg? --- GRAPH 
+        4) How many playlists a user creates in average? --- MONGO
 
 
 Aggregations for MongoDB
     1) Find the top k users that has created the highest number of playlists. --Aggregation / Admin 
-    2) Find the top k users that have added to them playlists the highest number of song of a specific artist. --Aggregation/User
+    2) Find the top k users that have added to them playlists the highest number of songs of a specific artist. --Aggregation/User
     3) Find the k most popular songs (based on how many playlist contains that specific song) --Dashboard songs
 
 
 On-graph queries for GraphDB
-    1) Find the most k followed users  -- Dashboard users
-    2) Find the most k followed playlists -- Dashboard playlist not logged
+    1) Find the k most followed users  -- Dashboard users
+    2) Find the k most followed playlists -- Dashboard playlist not logged
     3) Find the users that follows at least k same playlists of the User provided in input Aggregation/ Admin
     4) Find the k songs that has the highest number of comments -- Aggregation/admin
-    5) Find the playlists followed by users that a specific user follows --Dashboard playlist logged
+    5) Find k playlists followed by users that a specific user follows --Dashboard playlist logged
 
 Playlist:
   {
