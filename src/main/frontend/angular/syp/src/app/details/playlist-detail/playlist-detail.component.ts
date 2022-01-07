@@ -121,6 +121,7 @@ export class PlaylistDetailComponent implements OnInit {
         this.show = 'songs'
         if (!this.userLoggedIn) return
         if (this.userLoggedIn!.playlistsFollowed == undefined) this.getUserLoggedInPlaylistsFollowed()
+        else this.checkFollowed()
         this.checkAllowed()
       });
   }

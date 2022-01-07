@@ -58,7 +58,6 @@ export class UserDetailComponent implements OnInit {
     }
 
     this.userLoggedIn = JSON.parse(user)
-
   }
 
   getUserLoggedInFollowed(): void{
@@ -127,6 +126,7 @@ export class UserDetailComponent implements OnInit {
         if(!this.myAccount){
           if (!this.userLoggedIn) return
           if(this.userLoggedIn.followed == undefined) this.getUserLoggedInFollowed()
+          else this.checkFollowed()
         }
       });
   }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Playlist } from '../interfaces/playlist';
+import { Song } from '../interfaces/song';
 import { User } from '../interfaces/user';
 import { PlaylistService } from '../services/playlist.service';
 
@@ -10,7 +11,9 @@ import { PlaylistService } from '../services/playlist.service';
 })
 
 export class DashboardComponent implements OnInit {
-  playlists: Playlist[] = [];
+  playlists: Playlist[] | undefined = [];
+  songs: Song[] | undefined = []
+  users: User[] | undefined = []
   userLoggedIn: User | undefined;
   logged: boolean | undefined;
   allowed: boolean | undefined

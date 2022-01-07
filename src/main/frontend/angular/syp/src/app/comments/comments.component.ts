@@ -21,40 +21,60 @@ export class CommentsComponent implements OnInit {
 
   comments: userComment[] = []
   showModifyForm: boolean | undefined = false
-  newCommentVote: number | undefined
+  newCommentVote: string | undefined
   newCommentBody: string | undefined
   commented: boolean | undefined
   showCommentForm: boolean | undefined
+  avgVote: number | undefined
 
   constructor(private commentService: CommentService, private userService: UserService) { }
 
   ngOnInit(): void {
     this.getComments()
-    this.checkCommented()
   }
 
-  getComments(): void{
-    if(this.option == 'user'){
+  getComments(): void {
+    if (this.option == 'user') {
       this.commentService.getUserComments(this.user!.id)
-        .subscribe(comments => this.comments = comments)
+        .subscribe(comments => {
+          this.comments = comments
+          if (!this.userLoggedIn) return
+          if (this.userLoggedIn.comments == undefined) this.getUserLoggedInComments()
+          else this.checkCommented()
+          this.getAvgVote()
+        })
     }
-    if(this.option == 'song'){
+    if (this.option == 'song') {
       this.commentService.getSongComments(this.song!.id)
-        .subscribe(comments => this.comments = comments)
+        .subscribe(comments => {
+          this.comments = comments
+          if (!this.userLoggedIn) return
+          if (this.userLoggedIn.comments == undefined) this.getUserLoggedInComments()
+          else this.checkCommented()
+          this.getAvgVote()
+        })
     }
   }
 
-  getUserLoggedInComments(): void{
+  getAvgVote(): void {
+    var sum: number = 0
+    if(this.comments.length == 0) return
+    for (var i = 0; i < this.comments.length; i++) {
+      sum = sum + parseFloat(this.comments[i].vote)
+    }
+    this.avgVote = sum / this.comments.length
+  }
+
+  getUserLoggedInComments(): void {
     this.commentService.getUserComments(this.userLoggedIn!.id)
       .subscribe(comments => {
         this.userLoggedIn!.comments = comments
         this.updateUserLoggedIn()
+        this.checkCommented()
       })
   }
 
-  checkCommented(){
-    if (!this.userLoggedIn) return
-    if (this.userLoggedIn.comments == undefined) this.getUserLoggedInComments()
+  checkCommented() {
     for (var i = 0; i < this.userLoggedIn!.comments!.length; i++) {
       if (this.userLoggedIn?.comments![i].song?.id == this.song?.id) {
         this.commented = true
@@ -64,7 +84,7 @@ export class CommentsComponent implements OnInit {
     this.commented = false
   }
 
-  addComment(): void{
+  addComment(): void {
     var user = <User>{}
     user.id = this.userLoggedIn!.id
     user.username = this.userLoggedIn!.username
@@ -72,11 +92,16 @@ export class CommentsComponent implements OnInit {
     song.id = this.song!.id
     song.track = this.song!.track
     var vote = this.newCommentVote
+    var voteNum = parseFloat(vote!)
+    if(voteNum > 5 || voteNum < 0){
+      window.alert("The vote has to be between 0 and 5")
+      return
+    }
     var body = this.newCommentBody
     var date = new Date()
-    this.commentService.addComment( {user, song, vote, body, date} as userComment)
-      .subscribe(comment =>{
-        if(!this.userLoggedIn?.comments)
+    this.commentService.addComment({ user, song, vote, body, date } as userComment)
+      .subscribe(comment => {
+        if (!this.userLoggedIn?.comments)
           this.userLoggedIn!.comments = []
         this.userLoggedIn?.comments?.push(comment)
         this.updateUserLoggedIn()
@@ -103,13 +128,13 @@ export class CommentsComponent implements OnInit {
 
   saveComment(comment: userComment): void {
     if (comment) {
-      if(this.option == 'user'){
+      if (this.option == 'user') {
         var user = <User>{}
         user.id = this.userLoggedIn!.id
         user.username = this.userLoggedIn!.username
         comment.user = user
       }
-      if(this.option == 'song'){
+      if (this.option == 'song') {
         var song = <Song>{}
         song.id = this.song!.id
         song.track = this.song!.track
@@ -129,9 +154,9 @@ export class CommentsComponent implements OnInit {
     this.commentService.deleteComment(comment.id)
   }
 
-  findCommentIndex(commentId: number): number{
-    for(var i=0; i<this.userLoggedIn!.comments!.length; i++){
-      if(this.userLoggedIn?.comments![0].id == commentId) return i
+  findCommentIndex(commentId: number): number {
+    for (var i = 0; i < this.userLoggedIn!.comments!.length; i++) {
+      if (this.userLoggedIn?.comments![0].id == commentId) return i
     }
     return -1
   }

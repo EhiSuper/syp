@@ -5,7 +5,7 @@ export interface userComment{
     id: number
     user?: User
     song?: Song
-    vote: number
+    vote: string
     body: string
     date: Date
 }

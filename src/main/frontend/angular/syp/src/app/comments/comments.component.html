@@ -1,4 +1,5 @@
 <h2>Comments</h2>
+<h3 *ngIf="option == 'song' && avgVote != undefined">Avarage Vote: {{avgVote}}</h3>
 
 <button *ngIf="commented == false && option == 'song'" (click)="showCommentForm = !showCommentForm">Add Comment</button>
 <div *ngIf="showCommentForm == true">
@@ -18,25 +19,28 @@
   </form>
 </div>
 
-<ul class="comments">
-  <li *ngFor="let comment of comments">
-    <a *ngIf="option == 'user'" routerLink="/songs/{{comment.song!.id}}">Song: {{comment.song!.track}}</a>
-    <a *ngIf="option == 'song'" routerLink="/users/{{comment.user!.id}}">User: {{comment.user!.username}}</a>
-    Vote: {{comment.vote}} Comment: {{comment.body}} <!-- Date: {{comment.date | date:'medium'}} -->
-    <button *ngIf="allowed == true" (click)="showModifyForm = !showModifyForm">Modify</button>
-    <div *ngIf="showModifyForm == true">
-      <form (ngSubmit)="saveComment(comment)">
-        <div class="form-group">
-          <label for="vote">Vote: </label>
-          <input type="number" id="vote" name="vote" class="form-control" required [(ngModel)]="comment.vote">
-        </div>
-        <div class="form-group">
-          <label for="body">Body: </label>
-          <input type="text" id="body" name="body" class="form-control" required [(ngModel)]="comment.body">
-        </div>
-        <button type="submit" class="btn btn-success">Submit</button>
-      </form>
-    </div>
-    <button *ngIf="allowed == true" (click)="deleteComment(comment)">Delete</button>
-  </li>
-</ul>
+<div>
+  <ul class="comments">
+    <li *ngFor="let comment of comments">
+      <a *ngIf="option == 'user'" routerLink="/songs/{{comment.song!.id}}">Song: {{comment.song!.track}}</a>
+      <a *ngIf="option == 'song'" routerLink="/users/{{comment.user!.id}}">User: {{comment.user!.username}}</a>
+      Vote: {{comment.vote}} Comment: {{comment.body}}
+      <!-- Date: {{comment.date | date:'medium'}} -->
+      <button *ngIf="allowed == true" (click)="showModifyForm = !showModifyForm">Modify</button>
+      <div *ngIf="showModifyForm == true">
+        <form (ngSubmit)="saveComment(comment)">
+          <div class="form-group">
+            <label for="vote">Vote: </label>
+            <input type="number" id="vote" name="vote" class="form-control" required [(ngModel)]="comment.vote" max="5">
+          </div>
+          <div class="form-group">
+            <label for="body">Body: </label>
+            <input type="text" id="body" name="body" class="form-control" required [(ngModel)]="comment.body">
+          </div>
+          <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+      </div>
+      <button *ngIf="allowed == true" (click)="deleteComment(comment)">Delete</button>
+    </li>
+  </ul>
+</div>
