@@ -17,8 +17,15 @@ export class PlaylistService {
   constructor(private http: HttpClient) { }
 
   //Get the playlists to be displayed in the dashboard
-  getDashboardPlaylists(): Observable<Playlist[]> {
+  getTopPlaylists(): Observable<Playlist[]> {
     const url = `${this.playlistsUrl}/dashboard`;
+    return this.http.get<Playlist[]>(url).pipe(
+      catchError(this.handleError<Playlist[]>(`getTopPlaylists`))
+    );
+  }
+
+  getSuggestedPlaylists(id: string): Observable<Playlist[]> {
+    const url = `${this.playlistsUrl}/dashboard?id=${id}`;
     return this.http.get<Playlist[]>(url).pipe(
       catchError(this.handleError<Playlist[]>(`getTopPlaylists`))
     );

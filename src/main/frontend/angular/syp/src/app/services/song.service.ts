@@ -26,6 +26,13 @@ export class SongService {
     );
   }
 
+  getTopSongs(): Observable<Song[]> {
+    const url = `${this.songsUrl}/popular`;
+    return this.http.get<Song[]>(url).pipe(
+      catchError(this.handleError<Song[]>(`getSongs popular`))
+    );
+  }
+
   /* GET songs whose name contains search term */
   searchSongs(term: string): Observable<Song[]> {
     if (!term.trim()) {

@@ -35,6 +35,13 @@ export class UserService {
     );
   }
 
+  getTopUsers(): Observable<User[]> {
+    const url = `${this.usersUrl}/mostfollowed`;
+    return this.http.get<User[]>(url).pipe(
+      catchError(this.handleError<User[]>(`getTopUsers`))
+    );
+  }
+
   /* GET users whose name contains search term */
   searchUsers(term: string): Observable<User[]> {
     if (!term.trim()) {

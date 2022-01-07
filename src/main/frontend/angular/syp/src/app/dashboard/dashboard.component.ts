@@ -3,6 +3,8 @@ import { Playlist } from '../interfaces/playlist';
 import { Song } from '../interfaces/song';
 import { User } from '../interfaces/user';
 import { PlaylistService } from '../services/playlist.service';
+import { SongService } from '../services/song.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,13 +19,14 @@ export class DashboardComponent implements OnInit {
   userLoggedIn: User | undefined;
   logged: boolean | undefined;
   allowed: boolean | undefined
+  option: string | undefined = 'playlist'
 
-  constructor(private playlistService: PlaylistService) { }
+  constructor(private playlistService: PlaylistService, private songService: SongService, private userService: UserService) { }
 
   ngOnInit(): void {
     this.checkLogin()
     this.checkAllowed()
-    this.getPlaylists()
+    this.changeOption('playlist')
   }
 
   checkLogin(): void {
@@ -48,12 +51,34 @@ export class DashboardComponent implements OnInit {
     localStorage.removeItem('userLoggedIn');
     this.logged = false
     this.allowed = false
+    this.changeOption('playlist')
   }
 
-  getPlaylists(): void {
-    this.playlistService.getDashboardPlaylists()
-      .subscribe(playlists => {
-        this.playlists = playlists
-      });
+  changeOption(option: string) {
+    this.option = option
+    if (option == 'playlist' && this.logged == false) {
+      this.playlistService.getTopPlaylists()
+        .subscribe(playlists => {
+          this.playlists = playlists
+        })
+    }
+    if(option == 'playlist' && this.logged == true){
+      this.playlistService.getSuggestedPlaylists(this.userLoggedIn!.id)
+        .subscribe(playlists => {
+          this.playlists = playlists
+        })
+    }
+    if(option == 'song'){
+      this.songService.getTopSongs()
+        .subscribe(songs => {
+          this.songs = songs
+        })
+    }
+    if(option == 'user'){
+      this.userService.getTopUsers()
+        .subscribe(users => {
+          this.users = users
+        })
+    }
   }
 }

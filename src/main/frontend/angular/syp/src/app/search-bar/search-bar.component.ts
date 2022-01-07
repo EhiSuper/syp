@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 import { Observable, Subject } from 'rxjs';
 
@@ -25,6 +25,7 @@ export class SearchBarComponent implements OnInit {
   users$!: Observable<User[]>;
   private searchTerms = new Subject<string>();
   option: string = "playlist"
+  @Output() newOptionEvent = new EventEmitter<string>()
 
   constructor(
     private songService: SongService, 
@@ -33,6 +34,7 @@ export class SearchBarComponent implements OnInit {
 
   setOption(option:string): void {
     this.option = option;
+    this.newOptionEvent.emit(option)
     this.ngOnInit();
   }
 
