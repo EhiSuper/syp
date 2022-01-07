@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,7 @@ public class PlaylistService {
         }
     }
 
+    //@Transactional
     Playlist savePlaylist(Playlist newPlaylist){
         Playlist savedPlaylist = null;
         try {
@@ -90,6 +92,7 @@ public class PlaylistService {
         return savedPlaylist;
     }
 
+    //@Transactional
     public Playlist updatePlaylist(Playlist oldPlaylist, Playlist newPlaylist) {
         Playlist savedPlaylist = null;
         try{
@@ -180,6 +183,7 @@ public class PlaylistService {
         return null;
     }
 
+    //@Transactional
     public void deletePlaylist(String id) {
         Playlist deletedPlaylist = null;
         try{

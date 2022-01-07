@@ -68,6 +68,7 @@ public class SongService {
         return savedSong;
     }
 
+    //@Transactional
     Song updateSong(Song oldSong, Song newSong){
         Song updatedSong = null;
 
@@ -97,6 +98,7 @@ public class SongService {
         return updatedSong;
     }
 
+    //@Transactional
     void deleteSong(String id){
         Song deletedSong = null;
         try{

@@ -50,7 +50,7 @@ export class CommentsComponent implements OnInit {
         this.userLoggedIn!.comments = comments
         this.updateUserLoggedIn()
       })
-  }  
+  }
 
   checkCommented(){
     if (!this.userLoggedIn) return
@@ -103,6 +103,18 @@ export class CommentsComponent implements OnInit {
 
   saveComment(comment: userComment): void {
     if (comment) {
+      if(this.option == 'user'){
+        var user = <User>{}
+        user.id = this.userLoggedIn!.id
+        user.username = this.userLoggedIn!.username
+        comment.user = user
+      }
+      if(this.option == 'song'){
+        var song = <Song>{}
+        song.id = this.song!.id
+        song.track = this.song!.track
+        comment.song = song
+      }
       this.commentService.updateComment(comment)
         .subscribe();
     }

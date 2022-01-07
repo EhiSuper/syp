@@ -70,6 +70,7 @@ public class UserService {
         return savedUser;
     }
 
+    //@Transactional
     User updateUser(User oldUser, User newUser){
         User updatedUser = null;
         try {
@@ -95,6 +96,7 @@ public class UserService {
         return updatedUser;
     }
 
+    //@Transactional
     void deleteUser(String id){
         User deletedUser = null;
         try{
