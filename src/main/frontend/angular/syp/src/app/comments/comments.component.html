@@ -26,8 +26,8 @@
       <a *ngIf="option == 'song'" routerLink="/users/{{comment.user!.id}}">User: {{comment.user!.username}}</a>
       Vote: {{comment.vote}} Comment: {{comment.body}}
       <!-- Date: {{comment.date | date:'medium'}} -->
-      <button *ngIf="allowed == true" (click)="showModifyForm = !showModifyForm">Modify</button>
-      <div *ngIf="showModifyForm == true">
+      <button *ngIf="checkAllowed(comment)" (click)="showModifyForm(comment.id)">Modify</button>
+      <div *ngIf="modifyForm == comment.id">
         <form (ngSubmit)="saveComment(comment)">
           <div class="form-group">
             <label for="vote">Vote: </label>
@@ -40,7 +40,7 @@
           <button type="submit" class="btn btn-success">Submit</button>
         </form>
       </div>
-      <button *ngIf="allowed == true" (click)="deleteComment(comment)">Delete</button>
+      <button *ngIf="checkAllowed(comment)" (click)="deleteComment(comment)">Delete</button>
     </li>
   </ul>
 </div>

@@ -16,16 +16,15 @@ export class CommentsComponent implements OnInit {
   @Input() song: Song | undefined
   @Input() user: User | undefined
   @Input() option: string | undefined
-  @Input() allowed: boolean | undefined
   @Input() userLoggedIn: User | undefined
 
   comments: userComment[] = []
-  showModifyForm: boolean | undefined = false
+  modifyForm: number | undefined
   newCommentVote: string | undefined
   newCommentBody: string | undefined
   commented: boolean | undefined
   showCommentForm: boolean | undefined
-  avgVote: number | undefined
+  avgVote: string | undefined
 
   constructor(private commentService: CommentService, private userService: UserService) { }
 
@@ -58,11 +57,11 @@ export class CommentsComponent implements OnInit {
 
   getAvgVote(): void {
     var sum: number = 0
-    if(this.comments.length == 0) return
+    if (this.comments.length == 0) return
     for (var i = 0; i < this.comments.length; i++) {
       sum = sum + parseFloat(this.comments[i].vote)
     }
-    this.avgVote = sum / this.comments.length
+    this.avgVote = (sum / this.comments.length).toFixed(2)
   }
 
   getUserLoggedInComments(): void {
@@ -93,7 +92,7 @@ export class CommentsComponent implements OnInit {
     song.track = this.song!.track
     var vote = this.newCommentVote
     var voteNum = parseFloat(vote!)
-    if(voteNum > 5 || voteNum < 0){
+    if (voteNum > 5 || voteNum < 0) {
       window.alert("The vote has to be between 0 and 5")
       return
     }
@@ -105,6 +104,7 @@ export class CommentsComponent implements OnInit {
           this.userLoggedIn!.comments = []
         this.userLoggedIn?.comments?.push(comment)
         this.updateUserLoggedIn()
+        this.getComments()
       })
     this.commented = true
     this.showCommentForm = false
@@ -140,10 +140,15 @@ export class CommentsComponent implements OnInit {
         song.track = this.song!.track
         comment.song = song
       }
+      var voteNum = parseFloat(comment.vote)
+      if (voteNum > 5 || voteNum < 0) {
+        window.alert("The vote has to be between 0 and 5")
+        return
+      }
       this.commentService.updateComment(comment)
-        .subscribe();
+        .subscribe(_ => this.getComments());
     }
-    this.showModifyForm = !this.showModifyForm
+    this.modifyForm = undefined
   }
 
   deleteComment(comment: userComment): void {
@@ -152,6 +157,7 @@ export class CommentsComponent implements OnInit {
     this.userLoggedIn?.comments?.splice(index, 1)
     this.updateUserLoggedIn()
     this.commentService.deleteComment(comment.id)
+    this.getComments()
   }
 
   findCommentIndex(commentId: number): number {
@@ -160,4 +166,19 @@ export class CommentsComponent implements OnInit {
     }
     return -1
   }
+
+  showModifyForm(id: number): void {
+    if (this.modifyForm == undefined) this.modifyForm = id
+    else this.modifyForm = undefined
+  }
+
+  checkAllowed(comment: userComment): boolean{
+    if(this.userLoggedIn?.isAdmin) return true
+    for(var i=0 ; i<this.userLoggedIn!.comments!.length; i++){
+      if(this.userLoggedIn!.comments![i].id == comment.id) return true
+    }
+    return false
+  }
 }
+
+

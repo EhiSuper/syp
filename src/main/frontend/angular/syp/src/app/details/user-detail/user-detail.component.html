@@ -43,6 +43,6 @@
 
 <app-playlists *ngIf="show=='playlistsCreated'" [user]="user" [option]="'created'"></app-playlists>
 <app-playlists *ngIf="show=='playlistsFollowed'" [user]="user" [option]="'followed'"></app-playlists>
-<app-comments *ngIf="show=='comments'" [user]="user" [option]="'user'" [allowed]="allowed" [userLoggedIn]="userLoggedIn"></app-comments>
+<app-comments *ngIf="show=='comments'" [user]="user" [option]="'user'" [userLoggedIn]="userLoggedIn"></app-comments>
 <app-followers *ngIf="show=='followers'" [user]="user" [option]="'followers'"></app-followers>
 <app-followers *ngIf="show=='followed'" [user]="user" [option]="'followed'"></app-followers>
