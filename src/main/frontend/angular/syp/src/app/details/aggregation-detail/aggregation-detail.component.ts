@@ -156,21 +156,45 @@ export class AggregationDetailComponent implements OnInit {
     for(var i=0; i<this.aggregations.length; i++){
       if(this.aggregations[i].name == this.aggregation?.name) endpoint = this.aggregations[i].endpoint
     }
+    //monto l'endpoint
+    if(this.aggregation?.parameters){
+      for(var i=0; i<this.aggregation!.parameters!.length; i++){
+        var parameterElem: HTMLInputElement | null = document.getElementById(this.aggregation!.parameters![i]) as HTMLInputElement
+        var parameter = parameterElem.value
+        
+        if(i == 0) parameter = "?" + this.aggregation!.parameters![i] + "=" + parameter
+        else parameter = "&" + this.aggregation!.parameters![i] + "=" + parameter
+        endpoint = endpoint + parameter  
+      }
+    }
+    
     if(this.aggregation!.resultType == 'number'){
       this.playlistService.getResultNumber(endpoint)
-        .subscribe(results => this.resultNumber = results)
+        .subscribe(results => {
+          this.resultNumber = results
+          return
+        })
     }
     if(this.aggregation!.resultType == 'users'){
       this.playlistService.getResultUsers(endpoint)
-        .subscribe(results => this.resultUsers = results)
+        .subscribe(results => {
+          this.resultUsers = results
+          return
+        } )
     }
     if(this.aggregation!.resultType == 'playlists'){
       this.playlistService.getResultPlaylists(endpoint)
-        .subscribe(results => this.resultPlaylists = results)
+        .subscribe(results => {
+          this.resultPlaylists = results
+          return
+        })
     }
     if(this.aggregation!.resultType == 'songs'){
       this.playlistService.getResultSongs(endpoint)
-        .subscribe(results => this.resultSongs = results)
+        .subscribe(results => {
+          this.resultSongs = results
+          return
+        } )
     }
   }
 

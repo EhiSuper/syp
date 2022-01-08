@@ -9,7 +9,8 @@ import { userComment } from '../interfaces/userComment';
 @Injectable({ providedIn: 'root' })
 export class SongService {
 
-  private songsUrl = 'http://localhost:8080/api/songs';  // URL to web api
+  private serverUrl = "http://localhost:8080"
+  private songsUrl = this.serverUrl + '/api/songs';  // URL to web api
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })

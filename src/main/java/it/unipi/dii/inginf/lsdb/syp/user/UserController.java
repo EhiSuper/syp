@@ -72,9 +72,9 @@ public class UserController {
         return userService.getLikesById(id);
     }
 
-    @GetMapping("/api/users/similar/{username}")
+    @GetMapping("/api/users/similar")
     List<User> getSimilarUsers(@RequestParam(value="playlists", defaultValue = "2") String numberOfPlaylists,
-                               @PathVariable(value="username") String username) {
+                               @RequestParam(value="username") String username) {
         return userService.getSimilarUsers(username, Integer.parseInt(numberOfPlaylists));
     }
 

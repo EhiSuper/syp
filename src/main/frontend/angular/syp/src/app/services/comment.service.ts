@@ -11,7 +11,8 @@ import { userComment } from '../interfaces/userComment';
 @Injectable({ providedIn: 'root' })
 export class CommentService {
 
-  private commentsUrl = 'http://localhost:8080/api/comments';  // URL to web api
+  private serverUrl = "http://localhost:8080"
+  private commentsUrl = this.serverUrl + '/api/comments';  // URL to web api
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })

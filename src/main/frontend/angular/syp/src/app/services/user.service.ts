@@ -9,7 +9,8 @@ import { userComment } from '../interfaces/userComment';
 @Injectable({ providedIn: 'root' })
 export class UserService {
 
-  private usersUrl = 'http://localhost:8080/api/users';  // URL to web api
+  private serverUrl = "http://localhost:8080"
+  private usersUrl = this.serverUrl + '/api/users';  // URL to web api
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -95,7 +96,7 @@ export class UserService {
 
   // a user follow a user on the server
   follow(follower: string, followed: string): void {
-    const url = `http://localhost:8080/api/follow?follower=${follower}&followed=${followed}`;
+    const url = `${this.serverUrl}/api/follow?follower=${follower}&followed=${followed}`;
     this.http.get<Playlist>(url).pipe(
       catchError(this.handleError<Playlist>(`${follower} follow ${followed}`))
     ).subscribe();
@@ -103,7 +104,7 @@ export class UserService {
 
   // a user unfollow a user on the server
   unfollow(follower: string, followed: string): void {
-    const url = `http://localhost:8080/api/unfollow?follower=${follower}&followed=${followed}`;
+    const url = `${this.serverUrl}/api/unfollow?follower=${follower}&followed=${followed}`;
     this.http.get<Playlist>(url).pipe(
       catchError(this.handleError<Playlist>(`${follower} unfollow ${followed}`))
     ).subscribe();

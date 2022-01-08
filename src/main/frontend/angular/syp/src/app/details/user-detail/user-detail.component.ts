@@ -19,7 +19,7 @@ export class UserDetailComponent implements OnInit {
   followed: boolean | undefined
   myAccount: boolean | undefined
   allowed: boolean | undefined
-  showModifyForm: boolean | undefined
+  showModifyForm: boolean | undefined = false
 
   constructor(
     private route: ActivatedRoute,

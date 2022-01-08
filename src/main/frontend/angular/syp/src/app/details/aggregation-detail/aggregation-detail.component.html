@@ -6,11 +6,11 @@
     <div *ngIf="aggregation">
         <ul>
             <li *ngFor="let parameter of aggregation!.parameters">
-                <input placeholder="parameter">
+                <input placeholder="{{parameter}}" id="{{parameter}}">
             </li>
         </ul>
     </div>
-    
+
     <button type="submit">Result</button>
 </form>
 
@@ -25,7 +25,7 @@
 <div *ngIf="aggregation!.resultType=='users'">
     <ul>
         <li *ngFor="let user of resultUsers">
-            {{user.username}}
+            <a routerLink="/users/{{user.id}}">{{user.username}}</a>
         </li>
     </ul>
 </div>
@@ -33,7 +33,7 @@
 <div *ngIf="aggregation!.resultType=='playlists'">
     <ul>
         <li *ngFor="let playlist of resultPlaylists">
-            {{playlist.name}}
+            <a routerLink="/playlists/{{playlist.id}}">{{playlist.name}}</a>
         </li>
     </ul>
 </div>
@@ -41,7 +41,7 @@
 <div *ngIf="aggregation!.resultType=='songs'">
     <ul>
         <li *ngFor="let song of resultSongs">
-            {{song.track}}
+            <a routerLink="/songs/{{song.id}}">{{song.track}}</a>
         </li>
     </ul>
 </div>

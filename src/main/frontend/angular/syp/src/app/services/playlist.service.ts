@@ -9,7 +9,8 @@ import { Song } from '../interfaces/song';
 @Injectable({ providedIn: 'root' })
 export class PlaylistService {
 
-  private playlistsUrl = 'http://localhost:8080/api/playlists';  // URL to web api
+  private serverUrl = "http://localhost:8080"
+  private playlistsUrl = this.serverUrl + '/api/playlists';  // URL to web api
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -77,7 +78,7 @@ export class PlaylistService {
 
   // a user follow a playlist on the server
   likePlaylist(userId: string, playlistId: string): void {
-    const url = `http://localhost:8080/api/like?userId=${userId}&playlistId=${playlistId}`;
+    const url = `${this.serverUrl}/api/like?userId=${userId}&playlistId=${playlistId}`;
     this.http.get<Playlist>(url).pipe(
       catchError(this.handleError<Playlist>(`${userId} likes ${playlistId}`))
     ).subscribe();
@@ -85,7 +86,7 @@ export class PlaylistService {
 
   // a user unfollow a playlist on the server
   dislikePlaylist(userId: string, playlistId: string): void {
-    const url = `http://localhost:8080/api/dislike?userId=${userId}&playlistId=${playlistId}`;
+    const url = `${this.serverUrl}/api/dislike?userId=${userId}&playlistId=${playlistId}`;
     this.http.get<Playlist>(url).pipe(
       catchError(this.handleError<Playlist>(`${userId} likes ${playlistId}`))
     ).subscribe();
@@ -117,28 +118,28 @@ export class PlaylistService {
   }
 
   getResultNumber(endpoint: string): Observable<number> {
-    const url = `localhost:8080${endpoint}`;
+    const url = `${this.serverUrl}${endpoint}`;
     return this.http.get<number>(url).pipe(
       catchError(this.handleError<number>(`getResultNumber`))
     );
   }
 
   getResultUsers(endpoint: string): Observable<User[]> {
-    const url = `localhost:8080${endpoint}`;
+    const url = `${this.serverUrl}${endpoint}`;
     return this.http.get<User[]>(url).pipe(
       catchError(this.handleError<User[]>(`getResultUsers`))
     );
   }
 
   getResultPlaylists(endpoint: string): Observable<Playlist[]> {
-    const url = `localhost:8080${endpoint}`;
+    const url = `${this.serverUrl}${endpoint}`;
     return this.http.get<Playlist[]>(url).pipe(
       catchError(this.handleError<Playlist[]>(`getResultPlaylist`))
     );
   }
 
   getResultSongs(endpoint: string): Observable<Song[]> {
-    const url = `localhost:8080${endpoint}`;
+    const url = `${this.serverUrl}${endpoint}`;
     return this.http.get<Song[]>(url).pipe(
       catchError(this.handleError<Song[]>(`getResultSongs`))
     );
