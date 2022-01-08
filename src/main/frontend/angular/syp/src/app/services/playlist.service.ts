@@ -4,6 +4,8 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Playlist } from '../interfaces/playlist';
 import { User } from '../interfaces/user';
+import { Song } from '../interfaces/song';
+import { unwatchFile } from 'fs';
 
 @Injectable({ providedIn: 'root' })
 export class PlaylistService {
@@ -115,10 +117,31 @@ export class PlaylistService {
     };
   }
 
-  getResults(endpoint: string): Observable<string[]> {
-    const url = `localhost:8080/${endpoint}`;
-    return this.http.get<string[]>(url).pipe(
-      catchError(this.handleError<string[]>(`getResults`))
+  getResultNumber(endpoint: string): Observable<number> {
+    const url = `localhost:8080${endpoint}`;
+    return this.http.get<number>(url).pipe(
+      catchError(this.handleError<number>(`getResultNumber`))
+    );
+  }
+
+  getResultUsers(endpoint: string): Observable<User[]> {
+    const url = `localhost:8080${endpoint}`;
+    return this.http.get<User[]>(url).pipe(
+      catchError(this.handleError<User[]>(`getResultUsers`))
+    );
+  }
+
+  getResultPlaylists(endpoint: string): Observable<Playlist[]> {
+    const url = `localhost:8080${endpoint}`;
+    return this.http.get<Playlist[]>(url).pipe(
+      catchError(this.handleError<Playlist[]>(`getResultPlaylist`))
+    );
+  }
+
+  getResultSongs(endpoint: string): Observable<Song[]> {
+    const url = `localhost:8080${endpoint}`;
+    return this.http.get<Song[]>(url).pipe(
+      catchError(this.handleError<Song[]>(`getResultSongs`))
     );
   }
 }

@@ -3,4 +3,5 @@ export interface Aggregation{
     endpoint: string,
     parameters?: string[]
     access: string
+    resultType: string
 }

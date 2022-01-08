@@ -4,6 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { AggregationsComponent } from 'src/app/aggregations/aggregations.component';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { Song } from 'src/app/interfaces/song';
+import { Playlist } from 'src/app/interfaces/playlist';
+import { User } from 'src/app/interfaces/user';
 
 @Component({
   selector: 'app-aggregation-detail',
@@ -12,101 +15,121 @@ import { PlaylistService } from 'src/app/services/playlist.service';
 })
 export class AggregationDetailComponent implements OnInit {
 
-  results: string[] = []
+  number: number | undefined
+  resultUsers: User [] | undefined
+  resultPlaylists: Playlist[] | undefined
+  resultSongs: Song[] | undefined
   aggregation: Aggregation | undefined 
   aggregations: Aggregation[] = [
     {
       name: "How many songs has a playlist in average?",
       endpoint: "/api/playlists/averagesongs",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many followers has a playlist in average?",
       endpoint: "/api/playlists/averagefollows",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many artists contains a playlist in average?",
       endpoint: "",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many comments has a song in average?",
       endpoint: "/api/songs/averagecomments",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "On average a song in how many playlists is contained?",
       endpoint: "/api/songs/averageplaylists",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many followers has a user in average?",
       endpoint: "/api/users/averagefollows",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many playlists are followed by a user in average?",
       endpoint: "/api/users/averageplaylists",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many songs a user comments in average?",
       endpoint: "/api/users/averagecomments",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many playlists a user creates in average?",
       endpoint: "/api/users/averageplaylists",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "Find the top k users that has created the highest number of playlists",
       endpoint: "/api/users/topcreators",
       parameters: ["number"],
-      access: "admin"
+      access: "admin",
+      resultType: "users"
     },
     {
       name: "Find the top k users that have added to them playlists the highest number of songs of a specific artist",
       endpoint: "/api/users/mostsongsofartist",
       parameters: ["number", "artist"],
-      access: "user"
+      access: "user",
+      resultType: "users"
     },
     {
       name: "Find the k most popular songs (based on how many playlists contains that specific song)",
       endpoint: "/api/songs/popular",
       parameters: ["number"],
-      access: "user"
+      access: "user",
+      resultType: "songs"
     },
     {
       name: "Find the k most followed users",
       endpoint: "/api/users/mostfollowed",
       parameters: ["number"],
-      access: "user"
+      access: "user",
+      resultType: "users"
     },
     {
       name: "Find the k most followed playlists",
       endpoint: "/api/playlists/mostfollowed",
       parameters: ["number"],
-      access: "user"
+      access: "user",
+      resultType: "playlists"
     },
     {
       name: "Find the users that follows at least k same playlists of the User provided in input",
       endpoint: "/api/users/similar",
       parameters: ["playlists", "username"],
-      access: "user"
+      access: "user",
+      resultType: "users"
     },
     {
       name: "Find the k songs that has the highest number of comments",
       endpoint: "/api/songs/mostcommented",
       parameters: ["number"],
-      access: "admin"
+      access: "admin",
+      resultType: "songs"
     },
     {
       name: "Find the playlists followed by users that a specific user follows",
       endpoint: "/api/playlists/dashboard",
       parameters: ["number", "id"],
-      access: "user"
+      access: "user",
+      resultType: "playlists"
     }
   ]
 
@@ -133,10 +156,22 @@ export class AggregationDetailComponent implements OnInit {
     for(var i=0; i<this.aggregations.length; i++){
       if(this.aggregations[i].name == this.aggregation?.name) endpoint = this.aggregations[i].endpoint
     }
-    this.playlistService.getResults(endpoint)
-      .subscribe(results => {
-        this.results = results
-      })
+    if(this.aggregation!.resultType == 'number'){
+      this.playlistService.getResultNumber(endpoint)
+        .subscribe(results => this.number = results)
+    }
+    if(this.aggregation!.resultType == 'users'){
+      this.playlistService.getResultUsers(endpoint)
+        .subscribe(results => this.resultUsers = results)
+    }
+    if(this.aggregation!.resultType == 'playlists'){
+      this.playlistService.getResultPlaylists(endpoint)
+        .subscribe(results => this.resultPlaylists = results)
+    }
+    if(this.aggregation!.resultType == 'songs'){
+      this.playlistService.getResultSongs(endpoint)
+        .subscribe(results => this.resultSongs = results)
+    }
   }
 
 }
