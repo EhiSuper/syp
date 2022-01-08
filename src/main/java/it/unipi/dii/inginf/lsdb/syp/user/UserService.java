@@ -208,9 +208,9 @@ public class UserService {
         }
     }
 
-    public List<User> getSimilarUsers(String id, int numberOfPlaylist) {
+    public List<User> getSimilarUsers(String username, int numberOfPlaylist) {
         try{
-            return userRepository.getSimilarUsers(id, numberOfPlaylist);
+            return userRepository.getSimilarUsers(username, numberOfPlaylist);
         } catch(Exception e){
             e.printStackTrace();
             return null;
