@@ -14,95 +14,112 @@ export class AggregationsComponent implements OnInit {
     {
       name: "How many songs has a playlist in average?",
       endpoint: "/api/playlists/averagesongs",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many followers has a playlist in average?",
       endpoint: "/api/playlists/averagefollows",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many artists contains a playlist in average?",
       endpoint: "",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many comments has a song in average?",
       endpoint: "/api/songs/averagecomments",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "On average a song in how many playlists is contained?",
       endpoint: "/api/songs/averageplaylists",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many followers has a user in average?",
       endpoint: "/api/users/averagefollows",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many playlists are followed by a user in average?",
       endpoint: "/api/users/averageplaylists",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many songs a user comments in average?",
       endpoint: "/api/users/averagecomments",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "How many playlists a user creates in average?",
       endpoint: "/api/users/averageplaylists",
-      access: "admin"
+      access: "admin",
+      resultType: "number"
     },
     {
       name: "Find the top k users that has created the highest number of playlists",
       endpoint: "/api/users/topcreators",
       parameters: ["number"],
-      access: "admin"
+      access: "admin",
+      resultType: "users"
     },
     {
       name: "Find the top k users that have added to them playlists the highest number of songs of a specific artist",
       endpoint: "/api/users/mostsongsofartist",
       parameters: ["number", "artist"],
-      access: "user"
+      access: "user",
+      resultType: "users"
     },
     {
       name: "Find the k most popular songs (based on how many playlists contains that specific song)",
       endpoint: "/api/songs/popular",
       parameters: ["number"],
-      access: "user"
+      access: "user",
+      resultType: "songs"
     },
     {
       name: "Find the k most followed users",
       endpoint: "/api/users/mostfollowed",
       parameters: ["number"],
-      access: "user"
+      access: "user",
+      resultType: "users"
     },
     {
       name: "Find the k most followed playlists",
       endpoint: "/api/playlists/mostfollowed",
       parameters: ["number"],
-      access: "user"
+      access: "user",
+      resultType: "playlists"
     },
     {
       name: "Find the users that follows at least k same playlists of the User provided in input",
       endpoint: "/api/users/similar",
-      parameters: ["playlists", "userId"],
-      access: "user"
+      parameters: ["playlists", "username"],
+      access: "user",
+      resultType: "users"
     },
     {
       name: "Find the k songs that has the highest number of comments",
       endpoint: "/api/songs/mostcommented",
       parameters: ["number"],
-      access: "admin"
+      access: "admin",
+      resultType: "songs"
     },
     {
       name: "Find the playlists followed by users that a specific user follows",
       endpoint: "/api/playlists/dashboard",
       parameters: ["number", "id"],
-      access: "user"
+      access: "user",
+      resultType: "playlists"
     }
   ]
 

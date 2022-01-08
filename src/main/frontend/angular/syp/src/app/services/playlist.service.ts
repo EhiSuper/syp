@@ -5,7 +5,6 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { Playlist } from '../interfaces/playlist';
 import { User } from '../interfaces/user';
 import { Song } from '../interfaces/song';
-import { unwatchFile } from 'fs';
 
 @Injectable({ providedIn: 'root' })
 export class PlaylistService {

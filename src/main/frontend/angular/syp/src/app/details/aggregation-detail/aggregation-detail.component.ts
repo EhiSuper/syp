@@ -15,7 +15,7 @@ import { User } from 'src/app/interfaces/user';
 })
 export class AggregationDetailComponent implements OnInit {
 
-  number: number | undefined
+  resultNumber: number | undefined
   resultUsers: User [] | undefined
   resultPlaylists: Playlist[] | undefined
   resultSongs: Song[] | undefined
@@ -158,7 +158,7 @@ export class AggregationDetailComponent implements OnInit {
     }
     if(this.aggregation!.resultType == 'number'){
       this.playlistService.getResultNumber(endpoint)
-        .subscribe(results => this.number = results)
+        .subscribe(results => this.resultNumber = results)
     }
     if(this.aggregation!.resultType == 'users'){
       this.playlistService.getResultUsers(endpoint)

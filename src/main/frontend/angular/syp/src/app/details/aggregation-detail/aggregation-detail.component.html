@@ -16,10 +16,32 @@
 
 <h4>The Result is: </h4>
 
-<div>
+<div *ngIf="aggregation!.resultType=='number'">
     <ul>
-        <li *ngFor="let result of results">
-            {{result}}
+        <li>{{resultNumber}}</li>
+    </ul>
+</div>
+
+<div *ngIf="aggregation!.resultType=='users'">
+    <ul>
+        <li *ngFor="let user of resultUsers">
+            {{user.username}}
+        </li>
+    </ul>
+</div>
+
+<div *ngIf="aggregation!.resultType=='playlists'">
+    <ul>
+        <li *ngFor="let playlist of resultPlaylists">
+            {{playlist.name}}
+        </li>
+    </ul>
+</div>
+
+<div *ngIf="aggregation!.resultType=='songs'">
+    <ul>
+        <li *ngFor="let song of resultSongs">
+            {{song.track}}
         </li>
     </ul>
 </div>
