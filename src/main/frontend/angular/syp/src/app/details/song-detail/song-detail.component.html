@@ -21,7 +21,7 @@
       <label for="song-lyric">Song lyric: </label>
     </div>
   </div>
-  <div>
+  <div *ngIf="song.lyric">
     <div>
       <label id="song-lyric">{{song.lyric}}</label>
     </div>
