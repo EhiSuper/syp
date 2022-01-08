@@ -22,7 +22,7 @@
           <label for="password">Password: </label>
           <input type="text" id="password" name="password" class="form-control" required [(ngModel)]="user.password">
         </div>
-        <div class="form-group">
+        <div class="form-group"ngIf="userLoggedIn.isAdmin==true">
           <label for="isAdmin">Admin: </label>
           <input type="checkbox" id="isAdmin" name="isAdmin" class="form-control" required [(ngModel)]="user.isAdmin">
         </div>

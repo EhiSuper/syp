@@ -114,4 +114,11 @@ export class PlaylistService {
       return of(result as T);
     };
   }
+
+  getResults(endpoint: string): Observable<string[]> {
+    const url = `localhost:8080/${endpoint}`;
+    return this.http.get<string[]>(url).pipe(
+      catchError(this.handleError<string[]>(`getResults`))
+    );
+  }
 }

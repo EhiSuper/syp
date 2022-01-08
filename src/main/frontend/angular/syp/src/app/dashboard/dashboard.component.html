@@ -4,6 +4,7 @@
 <button *ngIf="logged==true" (click)="logout()">Logout</button>
 <button *ngIf="allowed==true"><a routerLink="/addSong">Add a new song</a></button>
 <button *ngIf="logged==true"><a routerLink="/addPlaylist">Add a new Playlist</a></button>
+<button *ngIf="logged==true"><a routerLink="/aggregations">Aggregations</a></button>
 
 <div *ngIf="option == 'playlist' && logged == false">
   <h2>Top Playlists</h2>

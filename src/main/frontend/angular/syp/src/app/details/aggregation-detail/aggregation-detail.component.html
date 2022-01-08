@@ -1,1 +1,25 @@
-<p>aggregation-detail works!</p>
+<h2 *ngIf="aggregation">{{aggregation!.name}}</h2>
+
+<button (click)="goBack()">go back</button>
+
+<form (ngSubmit)="getResult()">
+    <div *ngIf="aggregation">
+        <ul>
+            <li *ngFor="let parameter of aggregation!.parameters">
+                <input placeholder="parameter">
+            </li>
+        </ul>
+    </div>
+    
+    <button type="submit">Result</button>
+</form>
+
+<h4>The Result is: </h4>
+
+<div>
+    <ul>
+        <li *ngFor="let result of results">
+            {{result}}
+        </li>
+    </ul>
+</div>
