@@ -27,8 +27,8 @@ public interface PlaylistRepository extends Neo4jRepository<Playlist, String> {
     @Query("MATCH (u1)-[:LIKES]->(p) RETURN p, COUNT(u1) as numberOfFollowers ORDER BY numberOfFollowers DESC LIMIT $number")
     List<Playlist> getMostLikedPlaylists(int number);
 
-    @Query("MATCH (u1:User {identifier : $id})-[:FOLLOWS]->(u2:User)-[:LIKES]->(p2:Playlist) WHERE NOT (u1)-[:LIKES]-> (p2) RETURN DISTINCT p2 LIMIT $number")
-    List<Playlist> getSuggestedPlaylists(String id, int number);
+    @Query("MATCH (u1:User {name : $username})-[:FOLLOWS]->(u2:User)-[:LIKES]->(p2:Playlist) WHERE NOT (u1)-[:LIKES]-> (p2) RETURN DISTINCT p2 LIMIT $number")
+    List<Playlist> getSuggestedPlaylists(String username, int number);
 
     @Query("MATCH (n:Playlist) WITH COUNT(n) as NumberOfPlaylists MATCH ()-[f:LIKES]->() RETURN 1.0*COUNT(f)/NumberOfPlaylists")
     Double getAverageFollowsPerPlaylist();

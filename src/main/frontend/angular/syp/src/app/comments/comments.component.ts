@@ -173,6 +173,9 @@ export class CommentsComponent implements OnInit {
   }
 
   checkAllowed(comment: userComment): boolean{
+    if(!this.userLoggedIn){
+      return false
+    }
     if(this.userLoggedIn?.isAdmin) return true
     for(var i=0 ; i<this.userLoggedIn!.comments!.length; i++){
       if(this.userLoggedIn!.comments![i].id == comment.id) return true

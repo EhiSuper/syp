@@ -63,7 +63,7 @@ export class DashboardComponent implements OnInit {
         })
     }
     if(option == 'playlist' && this.logged == true){
-      this.playlistService.getSuggestedPlaylists(this.userLoggedIn!.id)
+      this.playlistService.getSuggestedPlaylists(this.userLoggedIn!.username)
         .subscribe(playlists => {
           this.playlists = playlists
         })

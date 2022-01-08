@@ -26,8 +26,8 @@ export class PlaylistService {
     );
   }
 
-  getSuggestedPlaylists(id: string): Observable<Playlist[]> {
-    const url = `${this.playlistsUrl}/dashboard?id=${id}`;
+  getSuggestedPlaylists(username: string): Observable<Playlist[]> {
+    const url = `${this.playlistsUrl}/dashboard?username=${username}`;
     return this.http.get<Playlist[]>(url).pipe(
       catchError(this.handleError<Playlist[]>(`getTopPlaylists`))
     );
