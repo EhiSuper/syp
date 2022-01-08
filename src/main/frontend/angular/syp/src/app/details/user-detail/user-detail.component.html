@@ -1,12 +1,14 @@
 <div *ngIf="user">
   <h2>{{user.username}} Details</h2>
-  <div>
-    <label for="user-username">Username: </label>
-    <label id="user-username">{{user.username}}</label>
-  </div>
-  <div>
-    <label for="user-dateOfCreation">Date of Creation: </label>
-    <label id="user-dateOfCreation">{{user.dateOfCreation | date }}</label>
+  <div class="details">
+    <div>
+      <label for="user-username">Username: </label>
+      <label id="user-username">{{user.username}}</label>
+    </div>
+    <div>
+      <label for="user-dateOfCreation">Date of Creation: </label>
+      <label id="user-dateOfCreation">{{user.dateOfCreation | date }}</label>
+    </div>
   </div>
   <div>
     <button *ngIf="followed==false && myAccount==false" (click)="follow()">Follow</button>

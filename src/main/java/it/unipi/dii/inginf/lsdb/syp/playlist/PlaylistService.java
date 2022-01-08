@@ -264,7 +264,11 @@ public class PlaylistService {
 
     public List<Playlist> getSuggestedPlaylists(String id, int number){
         try{
-            return playlistRepository.getSuggestedPlaylists(id, number);
+            List<Playlist> playlistToReturn = playlistRepository.getSuggestedPlaylists(id, number);
+            if(playlistToReturn.size()<3){
+                playlistToReturn = playlistRepository.getMostLikedPlaylists(number);
+            }
+            return playlistToReturn;
         } catch (Exception e){
             e.printStackTrace();
             return null;

@@ -32,12 +32,12 @@ public interface UserRepository extends Neo4jRepository<User, String> {
     @Query("MATCH (p:Playlist)<-[:LIKES]-(followers) WHERE p.id = $id RETURN followers")
     List<User> getLikesById(String id);
 
-    @Query( "MATCH path = ((n:User {id: $id})-[:LIKES]->(p)<-[:LIKES]-(users)) " +
+    @Query( "MATCH path = ((n:User {name: $username})-[:LIKES]->(p)<-[:LIKES]-(users)) " +
             "WHERE NOT (n.id = users.id) " +
             "WITH DISTINCT users as possibleUsers, count(path) as numberOfSharedPlaylist " +
             "WHERE numberOfSharedPlaylist >= $numberOfPlaylist " +
             "RETURN possibleUsers ORDER BY numberOfSharedPlaylist DESC")
-    List<User> getSimilarUsers(String id, int numberOfPlaylist);
+    List<User> getSimilarUsers(String username, int numberOfPlaylist);
 
     @Query("MATCH (u1)-[:FOLLOWS]->(u2) RETURN u2, COUNT(u1) as numberOfFollowers " +
            "ORDER BY numberOfFollowers DESC LIMIT $number")
