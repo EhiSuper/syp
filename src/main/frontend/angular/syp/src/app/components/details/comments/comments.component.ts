@@ -58,6 +58,7 @@ export class CommentsComponent implements OnInit {
   //function to get the avgVote of the song
   getAvgVote(): void {
     var sum: number = 0
+    if(!this.comments) return
     if (this.comments.length == 0) return
     for (var i = 0; i < this.comments.length; i++) {
       sum = sum + parseFloat(this.comments[i].vote)
@@ -77,6 +78,10 @@ export class CommentsComponent implements OnInit {
 
   //function that checks if the user has already commented the song
   checkCommented() {
+    if(!this.userLoggedIn?.comments){
+      this.commented = false;
+      return;
+    }
     for (var i = 0; i < this.userLoggedIn!.comments!.length; i++) {
       if (this.userLoggedIn?.comments![i].song?.id == this.song?.id) {
         this.commented = true
@@ -103,14 +108,20 @@ export class CommentsComponent implements OnInit {
     var body = this.newCommentBody
     var date = new Date()
     this.commentService.addComment({ user, song, vote, body, date } as userComment)
-      .subscribe(comment => {
-        if (!this.userLoggedIn?.comments)
-          this.userLoggedIn!.comments = []
-        this.userLoggedIn?.comments?.push(comment)
-        this.updateUserLoggedIn()
-        this.getComments()
+      .subscribe({
+        next: (comment) => {
+          if (!this.userLoggedIn?.comments)
+            this.userLoggedIn!.comments = []
+          this.userLoggedIn?.comments?.push(comment)
+          console.log(this.userLoggedIn)
+          this.updateUserLoggedIn()
+          this.getComments()
+          this.commented = true
+        },
+      error: () =>
+        window.alert("operation failed")
       })
-    this.commented = true
+
     this.showCommentForm = false
   }
 
@@ -153,19 +164,34 @@ export class CommentsComponent implements OnInit {
         return
       }
       this.commentService.updateComment(comment)
-        .subscribe(_ => this.getComments());
+        .subscribe(
+          {
+            next: () => {
+              this.getComments()
+            },
+            error: () => {
+              window.alert("operation failed")
+            }}
+        )
     }
     this.modifyForm = undefined
   }
 
   //function that deletes a comment
   deleteComment(comment: userComment): void {
-    this.comments = this.comments.filter(h => h !== comment);
-    var index = this.findCommentIndex(comment.id)
-    this.userLoggedIn?.comments?.splice(index, 1)
-    this.updateUserLoggedIn()
-    this.commentService.deleteComment(comment.id)
-    this.getComments()
+    this.commentService.deleteComment(comment.id).subscribe(
+      {
+        next: () => {
+          this.comments = this.comments.filter(h => h !== comment);
+          var index = this.findCommentIndex(comment.id)
+          this.userLoggedIn?.comments?.splice(index, 1)
+          this.updateUserLoggedIn()
+          this.getComments()
+        },
+        error: () => {
+          window.alert("operation failed")
+        }}
+    )
   }
 
   //function to find the index of the comment in the comments of the user logged in
@@ -184,6 +210,9 @@ export class CommentsComponent implements OnInit {
 
   //function that checks if the user logged in is allowed to do such operations
   checkAllowed(comment: userComment): boolean{
+    if(!this.userLoggedIn){
+      return false
+    }
     if(this.userLoggedIn?.isAdmin) return true
     for(var i=0 ; i<this.userLoggedIn!.comments!.length; i++){
       if(this.userLoggedIn!.comments![i].id == comment.id) return true

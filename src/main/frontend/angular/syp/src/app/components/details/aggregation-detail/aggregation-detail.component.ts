@@ -18,7 +18,7 @@ export class AggregationDetailComponent implements OnInit {
   resultUsers: User [] | undefined
   resultPlaylists: Playlist[] | undefined
   resultSongs: Song[] | undefined
-  aggregation: Aggregation | undefined 
+  aggregation: Aggregation | undefined
   aggregations: Aggregation[] = [
     {
       name: "How many songs has a playlist in average?",
@@ -125,8 +125,8 @@ export class AggregationDetailComponent implements OnInit {
     },
     {
       name: "Find the playlists followed by users that a specific user follows",
-      endpoint: "/api/playlists/dashboard",
-      parameters: ["number", "id"],
+      endpoint: "/api/playlists/suggested",
+      parameters: ["number", "username"],
       access: "user",
       resultType: "playlists"
     }
@@ -163,13 +163,13 @@ export class AggregationDetailComponent implements OnInit {
       for(var i=0; i<this.aggregation!.parameters!.length; i++){
         var parameterElem: HTMLInputElement | null = document.getElementById(this.aggregation!.parameters![i]) as HTMLInputElement
         var parameter = parameterElem.value
-        
+
         if(i == 0) parameter = "?" + this.aggregation!.parameters![i] + "=" + parameter
         else parameter = "&" + this.aggregation!.parameters![i] + "=" + parameter
-        endpoint = endpoint + parameter  
+        endpoint = endpoint + parameter
       }
     }
-    
+
     if(this.aggregation!.resultType == 'number'){
       this.playlistService.getResultNumber(endpoint)
         .subscribe(results => {

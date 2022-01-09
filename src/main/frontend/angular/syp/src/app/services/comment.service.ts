@@ -22,9 +22,7 @@ export class CommentService {
 
   /** POST: add a new comment to the server */
   addComment(comment: userComment): Observable<userComment> {
-    return this.http.post<userComment>(this.commentsUrl, comment, this.httpOptions).pipe(
-      catchError(this.handleError<userComment>('addComment'))
-    );
+    return this.http.post<userComment>(this.commentsUrl, comment, this.httpOptions);
   }
 
   // Obtain all comments written by a user
@@ -51,12 +49,10 @@ export class CommentService {
   }
 
   /** DELETE: delete the comment from the server */
-  deleteComment(id: number): void {
+  deleteComment(id: number): Observable<any> {
     const url = `${this.commentsUrl}/${id}`;
 
-    this.http.delete<userComment>(url, this.httpOptions).pipe(
-      catchError(this.handleError<userComment>('deleteComment'))
-    ).subscribe();
+    return this.http.delete<userComment>(url, this.httpOptions);
   }
 
   /**
@@ -69,6 +65,7 @@ export class CommentService {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
+      window.alert("failed operation")
       console.error(error); // log to console instead
 
       // Let the app keep running by returning an empty result.

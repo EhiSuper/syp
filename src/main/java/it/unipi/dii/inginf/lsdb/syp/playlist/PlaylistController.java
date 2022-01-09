@@ -62,11 +62,23 @@ public class PlaylistController {
 
     @GetMapping("/api/playlists/dashboard")
     List<Playlist> getDashboardPlaylists(@RequestParam(value="number", defaultValue = "3") String number,
-                                         @RequestParam(value="id", defaultValue = "") String id) {
-        if(id.equals("")){
+                                         @RequestParam(value="username", defaultValue = "") String username) {
+        if(username.equals("")){
             return playlistService.getMostLikedPlaylists(Integer.parseInt(number));
         }
-        return playlistService.getSuggestedPlaylists(id, Integer.parseInt(number));
+        List<Playlist> suggestedPlaylists = playlistService.getSuggestedPlaylists(username, Integer.parseInt(number));
+        if(suggestedPlaylists == null || suggestedPlaylists.size() < Integer.parseInt(number)){
+            return playlistService.getMostLikedPlaylists(Integer.parseInt(number));
+        }
+        else{
+            return suggestedPlaylists;
+        }
+    }
+
+    @GetMapping("api/playlists/suggested")
+    List<Playlist> getSuggestedPlaylists(@RequestParam(value="number", defaultValue = "3") String number,
+                                         @RequestParam(value="username", defaultValue = "") String username) {
+        return playlistService.getSuggestedPlaylists(username, Integer.parseInt(number));
     }
 
     @GetMapping("/api/playlists/averagesongs")

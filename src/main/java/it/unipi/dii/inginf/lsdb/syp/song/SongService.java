@@ -9,7 +9,9 @@ import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +55,7 @@ public class SongService {
             mongoTemplate.insert(newSong);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         try{
@@ -62,7 +64,7 @@ public class SongService {
             e.printStackTrace();
             Query findSongById = new Query(Criteria.where("_id").is(savedSong.getIdentifier()));
             mongoTemplate.remove(findSongById, Song.class);
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         return savedSong;
@@ -76,7 +78,7 @@ public class SongService {
             updatedSong = mongoTemplate.save(newSong);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         if(!oldSong.getTrack().equals(newSong.getTrack()) || !oldSong.getArtist().equals(newSong.getArtist())){
@@ -86,7 +88,7 @@ public class SongService {
             } catch (Exception e){
                 e.printStackTrace();
                 mongoTemplate.save(oldSong);
-                return null;
+                throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
             }
 
             Query findPlaylists = new Query(Criteria.where("songs._id").is(new ObjectId(updatedSong.getIdentifier())));
@@ -106,8 +108,7 @@ public class SongService {
             deletedSong = mongoTemplate.findAndRemove(findSongById, Song.class);
         } catch (Exception e){
             e.printStackTrace();
-            //return null;
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         try{
@@ -115,8 +116,7 @@ public class SongService {
         } catch (Exception e){
             e.printStackTrace();
             mongoTemplate.insert(deletedSong);
-            //return null
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         Query findPlaylists = new Query(Criteria.where("songs._id").is(new ObjectId(id)));

@@ -26,8 +26,8 @@ export class PlaylistService {
     );
   }
 
-  getSuggestedPlaylists(id: string): Observable<Playlist[]> {
-    const url = `${this.playlistsUrl}/dashboard?id=${id}`;
+  getSuggestedPlaylists(username: string): Observable<Playlist[]> {
+    const url = `${this.playlistsUrl}/dashboard?username=${username}`;
     return this.http.get<Playlist[]>(url).pipe(
       catchError(this.handleError<Playlist[]>(`getTopPlaylists`))
     );
@@ -55,9 +55,7 @@ export class PlaylistService {
   /** PUT: update the playlist on the server */
   updatePlaylist(playlistOld: Playlist, playlistNew: Playlist): Observable<any> {
     var list = [playlistOld, playlistNew]
-    return this.http.put(this.playlistsUrl, list, this.httpOptions).pipe(
-      catchError(this.handleError<any>('updatePlaylist'))
-    );
+    return this.http.put(this.playlistsUrl, list, this.httpOptions);
   }
 
   /** DELETE: delete the playlist from the server */
@@ -77,19 +75,15 @@ export class PlaylistService {
   }
 
   // a user follow a playlist on the server
-  likePlaylist(userId: string, playlistId: string): void {
+  likePlaylist(userId: string, playlistId: string): Observable<any> {
     const url = `${this.serverUrl}/api/like?userId=${userId}&playlistId=${playlistId}`;
-    this.http.get<Playlist>(url).pipe(
-      catchError(this.handleError<Playlist>(`${userId} likes ${playlistId}`))
-    ).subscribe();
+    return this.http.get<Playlist>(url)
   }
 
   // a user unfollow a playlist on the server
-  dislikePlaylist(userId: string, playlistId: string): void {
+  dislikePlaylist(userId: string, playlistId: string): Observable<any> {
     const url = `${this.serverUrl}/api/dislike?userId=${userId}&playlistId=${playlistId}`;
-    this.http.get<Playlist>(url).pipe(
-      catchError(this.handleError<Playlist>(`${userId} likes ${playlistId}`))
-    ).subscribe();
+    return this.http.get<Playlist>(url)
   }
 
   /** GET playlist's follower. Will 404 if id not found */
@@ -110,6 +104,7 @@ export class PlaylistService {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
+      window.alert("operation failed")
       console.error(error); // log to console instead
 
       // Let the app keep running by returning an empty result.

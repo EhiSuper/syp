@@ -77,7 +77,15 @@ export class SongDetailComponent implements OnInit {
   saveSong(): void {
     if (this.song) {
       this.songService.updateSong(this.snapshot!, this.song)
-        .subscribe();
+        .subscribe(
+          {
+            next: () => {
+            },
+            error: () => {
+              this.song = this.snapshot
+              window.alert("operation failed")
+            }}
+        )
     }
     this.showForm()
   }

@@ -115,8 +115,8 @@ export class AggregationsComponent implements OnInit {
     },
     {
       name: "Find the playlists followed by users that a specific user follows",
-      endpoint: "/api/playlists/dashboard",
-      parameters: ["number", "id"],
+      endpoint: "/api/playlists/suggested",
+      parameters: ["number", "username"],
       access: "user",
       resultType: "playlists"
     }

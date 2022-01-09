@@ -48,9 +48,7 @@ export class SongService {
   /** PUT: update the song on the server */
   updateSong(songOld: Song, songNew: Song): Observable<any> {
     var list = [songOld, songNew]
-    return this.http.put(this.songsUrl, list, this.httpOptions).pipe(
-      catchError(this.handleError<any>('updateSong'))
-    );
+    return this.http.put(this.songsUrl, list, this.httpOptions);
   }
 
   /** DELETE: delete the song from the server */
@@ -79,6 +77,7 @@ export class SongService {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
+      window.alert("operation failed")
       console.error(error); // log to console instead
 
       // Let the app keep running by returning an empty result.
