@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AddPlaylistComponent } from '../add-playlist/add-playlist.component';
-import { AddSongComponent } from '../add-song/add-song.component';
-import { AggregationsComponent } from '../aggregations/aggregations.component';
+import { AddPlaylistComponent } from '../components/main page/add-playlist/add-playlist.component';
+import { AddSongComponent } from '../components/main page/add-song/add-song.component';
+import { AggregationsComponent } from '../components/main page/aggregations/aggregations.component';
 
-import { DashboardComponent } from '../dashboard/dashboard.component';
-import { AggregationDetailComponent } from '../details/aggregation-detail/aggregation-detail.component';
-import { PlaylistDetailComponent } from '../details/playlist-detail/playlist-detail.component';
-import { SongDetailComponent } from '../details/song-detail/song-detail.component';
-import { UserDetailComponent } from '../details/user-detail/user-detail.component';
-import { SubscribeComponent } from '../subscribe/subscribe.component';
-import { LoginComponent } from '../utils/login/login.component';
+import { DashboardComponent } from '../components/main page/dashboard/dashboard.component';
+import { AggregationDetailComponent } from '../components/details/aggregation-detail/aggregation-detail.component';
+import { PlaylistDetailComponent } from '../components/details/playlist-detail/playlist-detail.component';
+import { SongDetailComponent } from '../components/details/song-detail/song-detail.component';
+import { UserDetailComponent } from '../components/details/user-detail/user-detail.component';
+import { SubscribeComponent } from '../components/main page/subscribe/subscribe.component';
+import { LoginComponent } from '../components/main page/login/login.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
