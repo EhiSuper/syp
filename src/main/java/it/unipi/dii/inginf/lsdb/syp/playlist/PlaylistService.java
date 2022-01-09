@@ -39,7 +39,7 @@ public class PlaylistService {
             return mongoTemplate.find(findPlaylistsByRegex, Playlist.class);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -49,7 +49,7 @@ public class PlaylistService {
             return mongoTemplate.findOne(findPlaylistById, Playlist.class);
         } catch(Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -247,7 +247,7 @@ public class PlaylistService {
             return playlistRepository.getLikedPlaylists(userId);
         } catch(Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -256,7 +256,7 @@ public class PlaylistService {
             return playlistRepository.getMostLikedPlaylists(number);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -266,7 +266,7 @@ public class PlaylistService {
             return playlistToReturn;
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -289,7 +289,7 @@ public class PlaylistService {
             return document.getDouble("avgNumberOfSongs");
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -298,7 +298,7 @@ public class PlaylistService {
             return playlistRepository.getAverageFollowsPerPlaylist();
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 }

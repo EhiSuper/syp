@@ -35,7 +35,7 @@ public class SongService {
             return mongoTemplate.find(findSongsByRegex, Song.class);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -45,7 +45,7 @@ public class SongService {
             return mongoTemplate.findOne(findSongById, Song.class);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -142,7 +142,7 @@ public class SongService {
             return result.getMappedResults();
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -151,7 +151,7 @@ public class SongService {
             return songRepository.getMostCommentedSongs(number);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -173,7 +173,7 @@ public class SongService {
             return document.getDouble("avgNumberOfPlaylists");
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -182,7 +182,7 @@ public class SongService {
             return songRepository.getAverageCommentsPerSong();
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 }

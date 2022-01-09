@@ -37,7 +37,7 @@ public class UserService {
             return mongoTemplate.find(findUsersByRegex, User.class);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -47,7 +47,7 @@ public class UserService {
             return mongoTemplate.findOne(findUserById, User.class);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -175,7 +175,7 @@ public class UserService {
             return userRepository.getFollowers(id);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -184,7 +184,7 @@ public class UserService {
             return userRepository.getFollowedUsers(id);
         } catch(Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -193,7 +193,7 @@ public class UserService {
             return userRepository.getLikesById(id);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -202,7 +202,7 @@ public class UserService {
             return userRepository.getSimilarUsers(username, numberOfPlaylist);
         } catch(Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -224,7 +224,7 @@ public class UserService {
             return result.getMappedResults();
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -251,7 +251,7 @@ public class UserService {
             return result.getMappedResults();
         } catch(Exception e) {
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -260,7 +260,7 @@ public class UserService {
             return userRepository.getMostFollowedUsers(number);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -283,7 +283,7 @@ public class UserService {
             return document.getDouble("avgNumberOfPlaylistsCreated");
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -292,7 +292,7 @@ public class UserService {
             return userRepository.getAverageFollows();
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -301,7 +301,7 @@ public class UserService {
             return userRepository.getAverageCommentsPerUser();
         } catch(Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 }

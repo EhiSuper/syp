@@ -29,7 +29,7 @@ public class CommentService {
             return commentRepository.findCommentsBySongId(songId);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -38,7 +38,7 @@ public class CommentService {
             return commentRepository.findCommentsByUserId(userId);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
