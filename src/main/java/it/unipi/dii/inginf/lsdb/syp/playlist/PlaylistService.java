@@ -12,8 +12,10 @@ import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +60,7 @@ public class PlaylistService {
             savedPlaylist = mongoTemplate.insert(newPlaylist);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         try{
@@ -67,7 +69,7 @@ public class PlaylistService {
             e.printStackTrace();
             Query findPlaylistById = new Query(Criteria.where("_id").is(savedPlaylist.getIdentifier()));
             mongoTemplate.remove(findPlaylistById, Playlist.class);
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         //manage redundancy
@@ -99,7 +101,7 @@ public class PlaylistService {
             savedPlaylist = mongoTemplate.save(newPlaylist);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         //if name changed, redundancy must be managed
@@ -109,7 +111,7 @@ public class PlaylistService {
             } catch (Exception e){
                 e.printStackTrace();
                 mongoTemplate.save(oldPlaylist);
-                return null;
+                throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
             }
             updateName(newPlaylist);
         }
@@ -191,8 +193,7 @@ public class PlaylistService {
             deletedPlaylist = mongoTemplate.findAndRemove(findPlaylistById, Playlist.class);
         } catch (Exception e){
             e.printStackTrace();
-            //return null;
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         //remove node from graph database
@@ -201,8 +202,7 @@ public class PlaylistService {
         } catch (Exception e){
             e.printStackTrace();
             mongoTemplate.insert(deletedPlaylist);
-            //return null;
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         //remove redundancy
@@ -229,8 +229,7 @@ public class PlaylistService {
             playlistRepository.addLike(userId, playlistId);
         } catch (Exception e){
             e.printStackTrace();
-            //return null;
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -239,8 +238,7 @@ public class PlaylistService {
             playlistRepository.removeLike(userId, playlistId);
         } catch (Exception e){
             e.printStackTrace();
-            //return null;
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 

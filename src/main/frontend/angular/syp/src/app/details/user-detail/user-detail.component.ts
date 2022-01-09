@@ -70,6 +70,10 @@ export class UserDetailComponent implements OnInit {
   }
 
   checkFollowed(): void {
+    if(!this.userLoggedIn?.followed){
+      this.followed = false
+      return
+    }
     for (var i = 0; i < this.userLoggedIn!.followed!.length; i++) {
       if (this.userLoggedIn?.followed![i].username == this.user?.username) {
         this.followed = true
@@ -90,10 +94,17 @@ export class UserDetailComponent implements OnInit {
     if(!this.userLoggedIn?.followed){
       this.userLoggedIn!.followed = []
     }
-    this.userLoggedIn?.followed!.push(this.user!)
-    this.updateUserLoggedIn()
-    this.userService.follow(this.userLoggedIn!.id, this.user!.id)
-    this.followed = true
+    this.userService.follow(this.userLoggedIn!.id, this.user!.id).subscribe(
+      {
+        next: () => {
+          this.userLoggedIn?.followed!.push(this.user!)
+          this.updateUserLoggedIn()
+          this.followed = true
+        },
+        error: () => {
+          window.alert("operation failed")
+        }}
+    )
   }
 
   findIndex(): number{
@@ -104,11 +115,18 @@ export class UserDetailComponent implements OnInit {
   }
 
   unfollow(): void{
-    var index = this.findIndex()
-    this.userLoggedIn?.followed?.splice(index, 1)
-    this.updateUserLoggedIn()
-    this.userService.unfollow(this.userLoggedIn!.id, this.user!.id)
-    this.followed = false
+    this.userService.unfollow(this.userLoggedIn!.id, this.user!.id).subscribe(
+      {
+        next: () => {
+          var index = this.findIndex()
+          this.userLoggedIn?.followed?.splice(index, 1)
+          this.updateUserLoggedIn()
+          this.followed = false
+        },
+        error: () => {
+          window.alert("operation failed")
+        }}
+    )
   }
 
   isMyAccount(): void{
@@ -143,12 +161,18 @@ export class UserDetailComponent implements OnInit {
   saveUser(): void {
     if (this.user) {
       this.userService.updateUser(this.snapshot!, this.user)
-        .subscribe();
-      if(this.myAccount){
-        this.user.followed = this.userLoggedIn?.followed
-        this.userLoggedIn = this.user
-        this.updateUserLoggedIn()
-      }
+        .subscribe({
+          next: () => {
+            if(this.myAccount){
+              this.user!.followed = this.userLoggedIn?.followed
+              this.userLoggedIn = this.user
+              this.updateUserLoggedIn()
+            }
+          },
+          error: () => {
+            this.user = Object.assign({}, this.snapshot)
+            window.alert("operation failed")
+          }});
     }
     this.showForm()
   }

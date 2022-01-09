@@ -57,6 +57,7 @@ export class CommentsComponent implements OnInit {
 
   getAvgVote(): void {
     var sum: number = 0
+    if(!this.comments) return
     if (this.comments.length == 0) return
     for (var i = 0; i < this.comments.length; i++) {
       sum = sum + parseFloat(this.comments[i].vote)
@@ -74,6 +75,10 @@ export class CommentsComponent implements OnInit {
   }
 
   checkCommented() {
+    if(!this.userLoggedIn?.comments){
+      this.commented = false;
+      return;
+    }
     for (var i = 0; i < this.userLoggedIn!.comments!.length; i++) {
       if (this.userLoggedIn?.comments![i].song?.id == this.song?.id) {
         this.commented = true
@@ -99,14 +104,20 @@ export class CommentsComponent implements OnInit {
     var body = this.newCommentBody
     var date = new Date()
     this.commentService.addComment({ user, song, vote, body, date } as userComment)
-      .subscribe(comment => {
-        if (!this.userLoggedIn?.comments)
-          this.userLoggedIn!.comments = []
-        this.userLoggedIn?.comments?.push(comment)
-        this.updateUserLoggedIn()
-        this.getComments()
+      .subscribe({
+        next: (comment) => {
+          if (!this.userLoggedIn?.comments)
+            this.userLoggedIn!.comments = []
+          this.userLoggedIn?.comments?.push(comment)
+          console.log(this.userLoggedIn)
+          this.updateUserLoggedIn()
+          this.getComments()
+          this.commented = true
+        },
+      error: () =>
+        window.alert("operation failed")
       })
-    this.commented = true
+
     this.showCommentForm = false
   }
 
@@ -146,18 +157,33 @@ export class CommentsComponent implements OnInit {
         return
       }
       this.commentService.updateComment(comment)
-        .subscribe(_ => this.getComments());
+        .subscribe(
+          {
+            next: () => {
+              this.getComments()
+            },
+            error: () => {
+              window.alert("operation failed")
+            }}
+        )
     }
     this.modifyForm = undefined
   }
 
   deleteComment(comment: userComment): void {
-    this.comments = this.comments.filter(h => h !== comment);
-    var index = this.findCommentIndex(comment.id)
-    this.userLoggedIn?.comments?.splice(index, 1)
-    this.updateUserLoggedIn()
-    this.commentService.deleteComment(comment.id)
-    this.getComments()
+    this.commentService.deleteComment(comment.id).subscribe(
+      {
+        next: () => {
+          this.comments = this.comments.filter(h => h !== comment);
+          var index = this.findCommentIndex(comment.id)
+          this.userLoggedIn?.comments?.splice(index, 1)
+          this.updateUserLoggedIn()
+          this.getComments()
+        },
+        error: () => {
+          window.alert("operation failed")
+        }}
+    )
   }
 
   findCommentIndex(commentId: number): number {

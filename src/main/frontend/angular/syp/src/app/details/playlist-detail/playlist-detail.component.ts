@@ -71,6 +71,10 @@ export class PlaylistDetailComponent implements OnInit {
   }
 
   checkFollowed(): void {
+    if(!this.userLoggedIn?.followed){
+      this.followed = false
+      return
+    }
     for (var i = 0; i < this.userLoggedIn!.playlistsFollowed!.length; i++) {
       if (this.userLoggedIn?.playlistsFollowed![i].name == this.playlist?.name) {
         this.followed = true
@@ -91,10 +95,18 @@ export class PlaylistDetailComponent implements OnInit {
     if (!this.userLoggedIn?.playlistsFollowed) {
       this.userLoggedIn!.playlistsFollowed = []
     }
-    this.userLoggedIn?.playlistsFollowed!.push(this.playlist!)
-    this.updateUserLoggedIn()
-    this.playlistService.likePlaylist(this.userLoggedIn!.id, this.playlist!.id)
-    this.followed = true
+
+    this.playlistService.likePlaylist(this.userLoggedIn!.id, this.playlist!.id).subscribe(
+      {
+        next: () => {
+          this.userLoggedIn?.playlistsFollowed!.push(this.playlist!)
+          this.updateUserLoggedIn()
+          this.followed = true
+        },
+        error: () => {
+          window.alert("operation failed")
+        }}
+    )
   }
 
   findIndexPlaylist(array: Array<Playlist>, playlist: Playlist) {
@@ -107,10 +119,17 @@ export class PlaylistDetailComponent implements OnInit {
 
   unfollow(): void {
     var index = this.findIndexPlaylist(this.userLoggedIn?.playlistsFollowed!, this.playlist!)
-    this.userLoggedIn?.playlistsFollowed!.splice(index!, 1)
-    this.updateUserLoggedIn()
-    this.playlistService.dislikePlaylist(this.userLoggedIn!.id, this.playlist!.id)
-    this.followed = false
+    this.playlistService.dislikePlaylist(this.userLoggedIn!.id, this.playlist!.id).subscribe(
+      {
+        next: () => {
+          this.userLoggedIn?.playlistsFollowed!.splice(index!, 1)
+          this.updateUserLoggedIn()
+          this.followed = false
+        },
+        error: () => {
+          window.alert("operation failed")
+        }}
+    )
   }
 
   getPlaylist(): void {
@@ -140,7 +159,15 @@ export class PlaylistDetailComponent implements OnInit {
   savePlaylist(): void {
     if (this.playlist) {
       this.playlistService.updatePlaylist(this.snapshot!, this.playlist)
-        .subscribe();
+        .subscribe(
+          {
+            next: () => {
+            },
+            error: () => {
+              this.playlist = Object.assign({}, this.snapshot)
+              window.alert("operation failed")
+            }}
+        );
     }
     this.showForm()
   }

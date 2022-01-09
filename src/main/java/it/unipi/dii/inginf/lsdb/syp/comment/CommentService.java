@@ -1,6 +1,8 @@
 package it.unipi.dii.inginf.lsdb.syp.comment;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class CommentService {
             return commentRepository.save(newComment);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -45,7 +47,7 @@ public class CommentService {
             return commentRepository.save(updatedComment);
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -54,8 +56,7 @@ public class CommentService {
             commentRepository.deleteById(id);
         } catch (Exception e){
             e.printStackTrace();
-            //return null;
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 }

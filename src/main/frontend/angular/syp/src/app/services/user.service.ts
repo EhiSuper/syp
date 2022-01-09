@@ -57,9 +57,8 @@ export class UserService {
   /** PUT: update the user on the server */
   updateUser(userOld: User, userNew: User): Observable<any> {
     var list = [userOld, userNew]
-    return this.http.put(this.usersUrl, list, this.httpOptions).pipe(
-      catchError(this.handleError<any>('updateUser'))
-    );
+    return this.http.put(this.usersUrl, list, this.httpOptions)
+      //.pipe(catchError(this.handleError<any>('updateUser')));
   }
 
   /** DELETE: delete the user from the server */
@@ -67,7 +66,7 @@ export class UserService {
     const url = `${this.usersUrl}/${id}`;
     this.http.delete<User>(url, this.httpOptions).pipe(
       catchError(this.handleError<User>('deleteUser'))
-    ).subscribe(() => console.log(url));
+    ).subscribe();
   }
 
   /** POST: add a new user to the server */
@@ -87,6 +86,7 @@ export class UserService {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
+      window.alert("operation failed")
       console.error(error); // log to console instead
 
       // Let the app keep running by returning an empty result.
@@ -95,19 +95,15 @@ export class UserService {
   }
 
   // a user follow a user on the server
-  follow(follower: string, followed: string): void {
+  follow(follower: string, followed: string): Observable<any> {
     const url = `${this.serverUrl}/api/follow?follower=${follower}&followed=${followed}`;
-    this.http.get<Playlist>(url).pipe(
-      catchError(this.handleError<Playlist>(`${follower} follow ${followed}`))
-    ).subscribe();
+    return this.http.get<Playlist>(url);
   }
 
   // a user unfollow a user on the server
-  unfollow(follower: string, followed: string): void {
+  unfollow(follower: string, followed: string): Observable<any> {
     const url = `${this.serverUrl}/api/unfollow?follower=${follower}&followed=${followed}`;
-    this.http.get<Playlist>(url).pipe(
-      catchError(this.handleError<Playlist>(`${follower} unfollow ${followed}`))
-    ).subscribe();
+    return this.http.get<Playlist>(url);
   }
 
   /** GET user by id. Will 404 if id not found */

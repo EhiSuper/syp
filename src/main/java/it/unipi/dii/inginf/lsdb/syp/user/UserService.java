@@ -10,7 +10,9 @@ import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +57,7 @@ public class UserService {
             savedUser = mongoTemplate.insert(newUser);
         } catch (Exception e){
             //failed operation
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
         //consistency between graph and document DBs
         try{
@@ -64,7 +66,7 @@ public class UserService {
             //failed operation
             Query findUserById = new Query(Criteria.where("_id").is(savedUser.getIdentifier()));
             mongoTemplate.remove(findUserById, User.class);
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         return savedUser;
@@ -77,7 +79,7 @@ public class UserService {
             updatedUser = mongoTemplate.save(newUser); //overwrites the entire document
         } catch (Exception e){
             //failed operation
-            return null;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         if(!oldUser.getUsername().equals(newUser.getUsername())){
@@ -86,7 +88,7 @@ public class UserService {
             } catch (Exception e){
                 //failed operation
                 mongoTemplate.save(oldUser);
-                return null;
+                throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
             }
             Query findPlaylists = new Query(Criteria.where("creator._id").is(new ObjectId(updatedUser.getIdentifier())));
             Update updatePlaylists = new Update().set("creator.username", updatedUser.getUsername());
@@ -104,16 +106,14 @@ public class UserService {
             deletedUser= mongoTemplate.findAndRemove(findUserById, User.class);
         } catch (Exception e){
             //failed operation
-            //return null
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
         try{
             userRepository.deleteUserByIdentifier(id);
         } catch (Exception e){
             //failed operation
             mongoTemplate.insert(deletedUser);
-            //return null
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         //delete playlists owned by deleted user
@@ -132,8 +132,7 @@ public class UserService {
             userRepository.addFollow(followerId, followedId);
         } catch (Exception e){
             e.printStackTrace();
-            //return null;
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -142,8 +141,7 @@ public class UserService {
             userRepository.removeFollow(followerId, followedId);
         } catch (Exception e){
             e.printStackTrace();
-            //return null;
-            return;
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -159,15 +157,6 @@ public class UserService {
             mongoTemplate.updateMulti(findSongs, updateSongs, Song.class);
         }
     }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////DA SPOSTARE IN UTILS//////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public List<String> getIdentifiersFromPlaylist(Playlist playlist){
         if(playlist.getSongs() != null) {
