@@ -52,7 +52,7 @@ public class SongService {
     Song saveSong(Song newSong){
         Song savedSong = null;
         try{
-            mongoTemplate.insert(newSong);
+            savedSong = mongoTemplate.insert(newSong);
         } catch (Exception e){
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);

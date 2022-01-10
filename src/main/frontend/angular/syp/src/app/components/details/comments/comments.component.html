@@ -22,9 +22,9 @@
 <div>
   <ul class="comments">
     <li *ngFor="let comment of comments">
-      <a *ngIf="option == 'user'" routerLink="/songs/{{comment.song!.id}}">Song: {{comment.song!.track}}</a>
-      <a *ngIf="option == 'song'" routerLink="/users/{{comment.user!.id}}">User: {{comment.user!.username}}</a>
-      Vote: {{comment.vote}} Comment: {{comment.body}}
+      <a *ngIf="option == 'user'" routerLink="/songs/{{comment.song!.id}}">{{comment.song!.track}}</a>
+      <a *ngIf="option == 'song'" routerLink="/users/{{comment.user!.id}}">{{comment.user!.username}}</a>
+      <b>vote:</b> {{comment.vote}} <b>comment:</b> {{comment.body}}
       <!-- Date: {{comment.date | date:'medium'}} -->
       <button *ngIf="checkAllowed(comment)" (click)="showModifyForm(comment.id)">Modify</button>
       <div *ngIf="modifyForm == comment.id">
