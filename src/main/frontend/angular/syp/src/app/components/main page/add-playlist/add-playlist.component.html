@@ -10,14 +10,6 @@
             <label for="songs">Add songs</label>
             <input #searchBox id="search-box" (input)="search(searchBox.value)" />
 
-            <ul class="search-result">
-                <li *ngFor="let song of songs$ | async">
-                    <a (click)="addSong(song)">
-                        {{song.track}}
-                    </a>
-                </li>
-            </ul>
-
             <div>
                 <ul>
                     <li *ngFor="let song of songsList">
@@ -25,6 +17,14 @@
                     </li> 
                 </ul>
             </div>
+
+            <ul class="search-result">
+                <li *ngFor="let song of songs$ | async">
+                    <a (click)="addSong(song)">
+                        {{song.track}}
+                    </a>
+                </li>
+            </ul>
             <button type="submit" class="btn btn-success">Add Playlist</button>
         </form>
     </div>
