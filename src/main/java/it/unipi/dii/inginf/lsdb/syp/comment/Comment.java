@@ -1,6 +1,5 @@
 package it.unipi.dii.inginf.lsdb.syp.comment;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import it.unipi.dii.inginf.lsdb.syp.song.Song;
 import it.unipi.dii.inginf.lsdb.syp.user.User;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
