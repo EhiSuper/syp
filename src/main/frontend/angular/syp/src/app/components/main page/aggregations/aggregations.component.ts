@@ -23,12 +23,6 @@ export class AggregationsComponent implements OnInit {
       resultType: "number"
     },
     {
-      name: "How many artists contains a playlist in average?",
-      endpoint: "",
-      access: "admin",
-      resultType: "number"
-    },
-    {
       name: "How many comments has a song in average?",
       endpoint: "/api/songs/averagecomments",
       access: "admin",

@@ -46,6 +46,6 @@ public interface UserRepository extends Neo4jRepository<User, String> {
     @Query("MATCH (n:User) WITH COUNT(n) as NumberOfUsers MATCH ()-[f:FOLLOWS]->() RETURN 1.0*COUNT(f)/NumberOfUsers")
     Double getAverageFollows();
 
-    @Query("MATCH (n:User) WITH COUNT(n) as NumberOfUsers MATCH ()-[w:WROTE]->() RETURN 1.0*COUNT(w)/NumberOfUsers")
+    @Query("MATCH (n:User) WITH COUNT(n) as NumberOfUsers MATCH ()-[w:WRITE]->() RETURN 1.0*COUNT(w)/NumberOfUsers")
     Double getAverageCommentsPerUser();
 }
