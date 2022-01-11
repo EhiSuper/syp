@@ -6,15 +6,15 @@
     <button (click)="setOption('user')">Search for users</button>
   </div>
 
-  
+
     <label for="search-box">Search {{option}}: </label>
     <input #searchBox id="search-box" (input)="search(searchBox.value)" />
-  
+
     <ul class="search-result">
       <div *ngIf="option=='song'" >
         <li *ngFor="let song of songs$ | async" >
           <a routerLink="/songs/{{song.id}}">
-            {{song.track}}
+            {{song.track}}, {{song.artist}}
           </a>
         </li>
       </div>
@@ -34,4 +34,4 @@
       </div>
     </ul>
 </div>
-  
+

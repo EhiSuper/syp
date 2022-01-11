@@ -79,6 +79,7 @@ export class AddPlaylistComponent implements OnInit {
     var songToBeAdded = <Song>{}
     songToBeAdded.id = song.id
     songToBeAdded.track = song.track
+    songToBeAdded.artist = song.artist
     this.songsList.push(songToBeAdded)
   }
 }
