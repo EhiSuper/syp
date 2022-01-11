@@ -47,10 +47,10 @@ export class CommentsComponent implements OnInit {
       this.commentService.getSongComments(this.song!.id)
         .subscribe(comments => {
           this.comments = comments
+          this.getAvgVote()
           if (!this.userLoggedIn) return
           if (this.userLoggedIn.comments == undefined) this.getUserLoggedInComments()
           else this.checkCommented()
-          this.getAvgVote()
         })
     }
   }
